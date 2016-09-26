@@ -3,6 +3,7 @@ import { HTTP } from 'meteor/http';
 var config = require("./config.js")
 var Users = new Mongo.Collection('Users');
 var Ids = new Mongo.Collection('Ids');
+var check = [];
 
 Meteor.startup(() => {
   // code to run on server at startup
@@ -48,7 +49,16 @@ Meteor.startup(() => {
     })
     .post(function () {
       var result = xml2js.parseStringSync(this.request.rawBody);
-      if (result.xml) {
+      var repeat = result.xml.FromUserName.join("") + result.xml.CreateTime.join("");
+      var dothing = true;
+      for (x in check) {
+        if (check[x] == repeat) {
+          dothing = false;
+          break;
+        }
+      }
+      if (result.xml && dothing) {
+        check.push(repeat);
         if (result.xml.Event == "subscribe") {
           var message = {};
           message.xml = {};
