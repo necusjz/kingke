@@ -62,7 +62,7 @@ Meteor.startup(() => {
           Ids.insert({name:"user", id:0});
         }
 
-        if (!Users.findOne({openid:result.xml.FromUserName})) {
+        if (!Users.findOne({openid:result.xml.FromUserName[0]})) {
           var user = {};
           id = Ids.findOne({"name":"user"});
           user.uid = id.id + 1;
