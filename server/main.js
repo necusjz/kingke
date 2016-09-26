@@ -54,6 +54,12 @@ Meteor.startup(() => {
         message.xml.MsgType = "text";
         message.xml.Content = "感谢您的关注";
         var builder = new xml2js.Builder();
+
+        Users = new Mongo.Collection('Users');
+        Users.insert(result.xml);
+        const user = Users.findOne({FromUserName:result.xml.FromUserName});
+        console.log(user);
+
         this.response.end(builder.buildObject(message));
       } else {
         this.response.end("");
