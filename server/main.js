@@ -55,10 +55,19 @@ Meteor.startup(() => {
         message.xml.Content = "感谢您的关注";
         var builder = new xml2js.Builder();
 
+        Ids = new Mongo.Collection('Ids');
+        if (!Ids.findOne({name:"user"})) {
+          Ids.insert({name:"user", id:0});
+        }
+
         Users = new Mongo.Collection('Users');
-        Users.insert(result.xml);
-        const user = Users.findOne({FromUserName:result.xml.FromUserName});
-        console.log(user);
+        if (!Users.findOne({openid:result.xml.FromUserName})) {
+          var user = {};
+          user.uid = Ids.findAndModify({update:{$inc:{'id':1}}, query:{"name":"user"}, new:true});
+          user.openid = result.xml.FromUserName;
+          Users.insert(user);
+        }
+        console.log(Users.findOne({FromUserName:result.xml.FromUserName}));
 
         this.response.end(builder.buildObject(message));
       } else {
