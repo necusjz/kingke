@@ -45,7 +45,20 @@ Meteor.startup(() => {
     })
     .post(function () {
       var result = xml2js.parseStringSync(this.request.rawBody);
-      console.log(result);
+      if (result.xml) {
+        var message = {};
+        message.xml = {};
+        message.xml.ToUserName = result.xml.FromUserName;
+        message.xml.FromUserName = result.xml.ToUserName;
+        message.xml.CreateTime = result.xml.CreateTime;
+        message.xml.MsgType = "text";
+        message.xml.Content = "感谢您的关注";
+        var builder = new xml2js.Builder();
+        console.log(builder.buildObject(message));
+
+      } else {
+        this.response.end("");
+      }
     });
 
   Router.route('/setmenu', function () {
