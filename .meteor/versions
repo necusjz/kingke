@@ -60,6 +60,8 @@ mongo-id@1.0.5
 npm-mongo@1.5.48
 observe-sequence@1.0.12
 ordered-dict@1.0.8
+peerlibrary:blocking@0.5.2
+peerlibrary:xml2js@0.4.8_1
 promise@0.8.4
 random@1.0.10
 reactive-dict@1.0.5

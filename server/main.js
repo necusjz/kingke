@@ -1,30 +1,81 @@
 import { Meteor } from 'meteor/meteor';
 import { HTTP } from 'meteor/http';
 var config = require("./config.js")
+var Users = new Mongo.Collection('Users');
+var Ids = new Mongo.Collection('Ids');
 
 Meteor.startup(() => {
   // code to run on server at startup
-    
-  Router.route('/weixin', function () {
-    var req = this.request;
-    var res = this.response;
-    var signature = this.params.query.signature;
-    var timestamp = this.params.query.timestamp;
-    var nonce = this.params.query.nonce;
-    var echostr = this.params.query.echostr;
-    var l = new Array();
-    l[0] = nonce;
-    l[1] = timestamp;
-    l[2] = config.token;
-    l.sort();
-    var original = l.join('');
-    var sha = CryptoJS.SHA1(original).toString();
-    if (signature == sha) {
-      res.end(echostr);
-    } else {
-      res.end("false");
-    }
-  }, {where: 'server'});
+
+  if (Meteor.isServer) {
+    Router.configureBodyParsers = function () {
+      Router.onBeforeAction( Iron.Router.bodyParser.json(), {except: ['creditReferral'], where: 'server'});
+      //Enable incoming XML requests for creditReferral route
+      Router.onBeforeAction(
+        Iron.Router.bodyParser.raw({
+          type: '*/*', 
+          only: ['creditReferral'],
+          verify: function(req, res, body) { 
+            req.rawBody = body.toString(); 
+          }, 
+          where: 'server'
+        })
+      );
+      Router.onBeforeAction( Iron.Router.bodyParser.urlencoded({ extended: false }), {where: 'server'});
+    };
+  }
+
+  Router.route('/weixin', {where: 'server'},)
+    .get(function () {
+      var req = this.request;
+      var res = this.response;
+      var signature = this.params.query.signature;
+      var timestamp = this.params.query.timestamp;
+      var nonce = this.params.query.nonce;
+      var echostr = this.params.query.echostr;
+      var l = new Array();
+      l[0] = nonce;
+      l[1] = timestamp;
+      l[2] = config.token;
+      l.sort();
+      var original = l.join('');
+      var sha = CryptoJS.SHA1(original).toString();
+      if (signature == sha) {
+        res.end(echostr);
+      } else {
+        res.end("false");
+      }
+    })
+    .post(function () {
+      var result = xml2js.parseStringSync(this.request.rawBody);
+      if (result.xml && result.xml.Event == "subscribe") {
+        var message = {};
+        message.xml = {};
+        message.xml.ToUserName = result.xml.FromUserName;
+        message.xml.FromUserName = result.xml.ToUserName;
+        message.xml.CreateTime = result.xml.CreateTime;
+        message.xml.MsgType = "text";
+        message.xml.Content = "感谢您的关注";
+        var builder = new xml2js.Builder();
+
+        if (!Ids.findOne({name:"user"})) {
+          Ids.insert({name:"user", id:0});
+        }
+
+        if (!Users.findOne({openid:result.xml.FromUserName[0]})) {
+          var user = {};
+          id = Ids.findOne({"name":"user"});
+          user.uid = id.id + 1;
+          Ids.update({"name":"user"}, {$inc:{id: 1}});
+          user.openid = result.xml.FromUserName[0];
+          Users.insert(user);
+        }
+
+        this.response.end(builder.buildObject(message));
+      } else {
+        this.response.end("");
+      }
+    });
 
   Router.route('/setmenu', function () {
     var res = this.response;
@@ -57,13 +108,23 @@ Meteor.startup(() => {
       var userinfo_result = HTTP.get(userinfo_url);
       var userinfo_data = JSON.parse(userinfo_result.content);
 
+      var token_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + config.appID + "&secret=" + config.appsecret;
+      var token_result = HTTP.get(token_url);
+      access_token = token_result.data.access_token;
+      user = Users.findOne({openid:openid});
+      var qrcode_url = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=" + access_token;
+      var qrcode_data = '{"expire_seconds": 604800, "action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": ' + user.uid + '}}}';
+      var qrcode_result = HTTP.post(qrcode_url,{content: qrcode_data});
+      var qrcode_json = JSON.parse(qrcode_result.content);
+      var qrcode_img = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + encodeURIComponent(qrcode_json.ticket);
       SSR.compileTemplate('info', Assets.getText('info.html'));
       Template.info.helpers({
         country: userinfo_data.country,
         province: userinfo_data.province,
         city: userinfo_data.city,
         nickname: userinfo_data.nickname,
-        headimgurl: userinfo_data.headimgurl
+        headimgurl: userinfo_data.headimgurl,
+        qrcodeurl: qrcode_img
       });
       var html = SSR.render("info");
       res.end(html);
