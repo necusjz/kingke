@@ -1,6 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import { HTTP } from 'meteor/http';
 var config = require("./config.js")
+var Users = new Mongo.Collection('Users');
+var Ids = new Mongo.Collection('Ids');
 
 Meteor.startup(() => {
   // code to run on server at startup
@@ -56,12 +58,10 @@ Meteor.startup(() => {
         message.xml.Content = "感谢您的关注";
         var builder = new xml2js.Builder();
 
-        var Ids = new Mongo.Collection('Ids');
         if (!Ids.findOne({name:"user"})) {
           Ids.insert({name:"user", id:0});
         }
 
-        var Users = new Mongo.Collection('Users');
         if (!Users.findOne({openid:result.xml.FromUserName})) {
           var user = {};
           id = Ids.findOne({"name":"user"});
@@ -111,7 +111,6 @@ Meteor.startup(() => {
       var token_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + config.appID + "&secret=" + config.appsecret;
       var token_result = HTTP.get(token_url);
       access_token = token_result.data.access_token;
-      var Users = new Mongo.Collection('Users');
       user = Users.findOne({openid:openid});
       var qrcode_url = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=" + access_token;
       var qrcode_data = '{"expire_seconds": 604800, "action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": ' + user.uid + '}}}';
