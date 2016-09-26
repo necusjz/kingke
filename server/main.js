@@ -63,7 +63,10 @@ Meteor.startup(() => {
         Users = new Mongo.Collection('Users');
         if (!Users.findOne({openid:result.xml.FromUserName})) {
           var user = {};
-          user.uid = Ids.findAndModify({update:{$inc:{'id':1}}, query:{"name":"user"}, new:true});
+          id = Ids.findOne({"name":"user"});
+          id.id = id.id + 1;
+          user.uid = id.id;
+          id = Ids.save(id);
           user.openid = result.xml.FromUserName;
           Users.insert(user);
         }
