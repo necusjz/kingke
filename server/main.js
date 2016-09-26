@@ -45,7 +45,7 @@ Meteor.startup(() => {
     })
     .post(function () {
       var result = xml2js.parseStringSync(this.request.rawBody);
-      if (result.xml) {
+      if (result.xml && result.xml.Event == "subscribe") {
         var message = {};
         message.xml = {};
         message.xml.ToUserName = result.xml.FromUserName;
@@ -54,8 +54,7 @@ Meteor.startup(() => {
         message.xml.MsgType = "text";
         message.xml.Content = "感谢您的关注";
         var builder = new xml2js.Builder();
-        console.log(builder.buildObject(message));
-
+        this.response.end(builder.buildObject(message));
       } else {
         this.response.end("");
       }
