@@ -44,7 +44,8 @@ Meteor.startup(() => {
       }
     })
     .post(function () {
-      console.log(this.request.rawBody);
+      var result = xml2js.parseStringSync(this.request.rawBody);
+      console.log(result);
     });
 
   Router.route('/setmenu', function () {
