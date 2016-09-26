@@ -49,30 +49,47 @@ Meteor.startup(() => {
     .post(function () {
       var result = xml2js.parseStringSync(this.request.rawBody);
       if (result.xml && result.xml.Event == "subscribe") {
-        var message = {};
-        message.xml = {};
-        message.xml.ToUserName = result.xml.FromUserName;
-        message.xml.FromUserName = result.xml.ToUserName;
-        message.xml.CreateTime = result.xml.CreateTime;
-        message.xml.MsgType = "text";
-        message.xml.Content = "感谢您的关注";
-        var builder = new xml2js.Builder();
+        if (result.xml.Event == "subscribe") {
+          var message = {};
+          message.xml = {};
+          message.xml.ToUserName = result.xml.FromUserName;
+          message.xml.FromUserName = result.xml.ToUserName;
+          message.xml.CreateTime = result.xml.CreateTime;
+          message.xml.MsgType = "text";
+          message.xml.Content = "感谢您的关注";
+          var builder = new xml2js.Builder();
 
-        if (!Ids.findOne({name:"user"})) {
-          Ids.insert({name:"user", id:0});
+          if (!Ids.findOne({name:"user"})) {
+            Ids.insert({name:"user", id:0});
+          }
+
+          if (!Users.findOne({openid:result.xml.FromUserName[0]})) {
+            var user = {};
+            id = Ids.findOne({"name":"user"});
+            user.uid = id.id + 1;
+            Ids.update({"name":"user"}, {$inc:{id: 1}});
+            user.openid = result.xml.FromUserName[0];
+            Users.insert(user);
+          }
+
+          this.response.end(builder.buildObject(message));
         }
+        if (result.xml.EventKey) {
+          var followid = result.xml.EventKey.join('').substr(8);
+          var teacher = Users.findOne({uid:followid});
+          var student = Users.findOne({openid:result.xml.FromUserName[0]});
+          
+          var token_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + config.appID + "&secret=" + config.appsecret;
+          var token_result = HTTP.get(token_url);
+          var access_token = token_result.data.access_token;
+          var templet_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token;
+          var templet_data = '{"touser":"' + teacher.openid + '","template_id":"' + config.follow_templet_id + '","url":"","data":{"text": {"value":"你已关注' + student.openid + '","color":"#173177"}}}';
+          var templet_result = HTTP.post(templet_url, {content: templet_data});
+          var templet_data = '{"touser":"' + student.openid + '","template_id":"' + config.follow_templet_id + '","url":"","data":{"text": {"value":"你已关注' + teacher.openid + '","color":"#173177"}}}';
+          var templet_result = HTTP.post(templet_url, {content: templet_data});
 
-        if (!Users.findOne({openid:result.xml.FromUserName[0]})) {
-          var user = {};
-          id = Ids.findOne({"name":"user"});
-          user.uid = id.id + 1;
-          Ids.update({"name":"user"}, {$inc:{id: 1}});
-          user.openid = result.xml.FromUserName[0];
-          Users.insert(user);
         }
-
-        this.response.end(builder.buildObject(message));
-      } else {
+      } else{
         this.response.end("");
       }
     });
