@@ -69,7 +69,6 @@ Meteor.startup(() => {
           user.openid = result.xml.FromUserName[0];
           Users.insert(user);
         }
-        console.log(Users.findOne({openid:result.xml.FromUserName[0]}));
 
         this.response.end(builder.buildObject(message));
       } else {
@@ -108,13 +107,25 @@ Meteor.startup(() => {
       var userinfo_result = HTTP.get(userinfo_url);
       var userinfo_data = JSON.parse(userinfo_result.content);
 
+      var token_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + config.appID + "&secret=" + config.appsecret;
+      var token_result = HTTP.get(token_url);
+      access_token = token_result.data.access_token;
+      Users = new Mongo.Collection('Users');
+      user = Users.findOne({openid:openid});
+      var qrcode_url = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=" + access_token;
+      var qrcode_data = '{"expire_seconds": 604800, "action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": ' + user.uid + '}}}';
+      var qrcode_result = HTTP.post(qrcode_url,{content: qrcode_data});
+      var qrcode_json = JSON.parse(qrcode_result);
+      var qrcode_img = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + encodeURIComponent(qrcode_json.ticket);
+      
       SSR.compileTemplate('info', Assets.getText('info.html'));
       Template.info.helpers({
         country: userinfo_data.country,
         province: userinfo_data.province,
         city: userinfo_data.city,
         nickname: userinfo_data.nickname,
-        headimgurl: userinfo_data.headimgurl
+        headimgurl: userinfo_data.headimgurl,
+        qrcodeurl: qrcode_img
       });
       var html = SSR.render("info");
       res.end(html);
