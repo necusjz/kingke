@@ -64,13 +64,12 @@ Meteor.startup(() => {
         if (!Users.findOne({openid:result.xml.FromUserName})) {
           var user = {};
           id = Ids.findOne({"name":"user"});
-          id.id = id.id + 1;
-          user.uid = id.id;
-          id = Ids.save(id);
-          user.openid = result.xml.FromUserName;
+          user.uid = id.id + 1;
+          Ids.update({"name":"user"}, {$inc:{id: 1}});
+          user.openid = result.xml.FromUserName[0];
           Users.insert(user);
         }
-        console.log(Users.findOne({FromUserName:result.xml.FromUserName}));
+        console.log(Users.findOne({openid:result.xml.FromUserName[0]}));
 
         this.response.end(builder.buildObject(message));
       } else {
