@@ -4,27 +4,48 @@ var config = require("./config.js")
 
 Meteor.startup(() => {
   // code to run on server at startup
-    
-  Router.route('/weixin', function () {
-    var req = this.request;
-    var res = this.response;
-    var signature = this.params.query.signature;
-    var timestamp = this.params.query.timestamp;
-    var nonce = this.params.query.nonce;
-    var echostr = this.params.query.echostr;
-    var l = new Array();
-    l[0] = nonce;
-    l[1] = timestamp;
-    l[2] = config.token;
-    l.sort();
-    var original = l.join('');
-    var sha = CryptoJS.SHA1(original).toString();
-    if (signature == sha) {
-      res.end(echostr);
-    } else {
-      res.end("false");
-    }
-  }, {where: 'server'});
+  if (Meteor.isServer) {
+    Router.configureBodyParsers = function () {
+      Router.onBeforeAction( Iron.Router.bodyParser.json(), {except: ['creditReferral'], where: 'server'});
+      //Enable incoming XML requests for creditReferral route
+      Router.onBeforeAction(
+        Iron.Router.bodyParser.raw({
+          type: '*/*', 
+          only: ['creditReferral'],
+          verify: function(req, res, body) { 
+            req.rawBody = body.toString(); 
+          }, 
+          where: 'server'
+        })
+      );
+      Router.onBeforeAction( Iron.Router.bodyParser.urlencoded({ extended: false }), {where: 'server'});
+    };
+  }
+
+  Router.route('/weixin', {where: 'server'},)
+    .get(function () {
+      var req = this.request;
+      var res = this.response;
+      var signature = this.params.query.signature;
+      var timestamp = this.params.query.timestamp;
+      var nonce = this.params.query.nonce;
+      var echostr = this.params.query.echostr;
+      var l = new Array();
+      l[0] = nonce;
+      l[1] = timestamp;
+      l[2] = config.token;
+      l.sort();
+      var original = l.join('');
+      var sha = CryptoJS.SHA1(original).toString();
+      if (signature == sha) {
+        res.end(echostr);
+      } else {
+        res.end("false");
+      }
+    })
+    .post(function () {
+      console.log(this.request.rawBody);
+    });
 
   Router.route('/setmenu', function () {
     var res = this.response;
