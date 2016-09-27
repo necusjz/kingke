@@ -42,19 +42,19 @@ Meteor.startup(() => {
 
   if (Meteor.isServer) {
     Router.configureBodyParsers = function () {
-      Router.onBeforeAction( Iron.Router.bodyParser.json(), {except: ['creditReferral'], where: 'server'});
+      Router.onBeforeAction(Iron.Router.bodyParser.json());
+      Router.onBeforeAction(Iron.Router.bodyParser.urlencoded({extended: false}));
       //Enable incoming XML requests for creditReferral route
       Router.onBeforeAction(
         Iron.Router.bodyParser.raw({
-          type: '*/*', 
-          only: ['creditReferral'],
+          type: '*/*',
+          only: ['weixin'],
           verify: function(req, res, body) { 
             req.rawBody = body.toString(); 
           }, 
           where: 'server'
         })
       );
-      Router.onBeforeAction( Iron.Router.bodyParser.urlencoded({ extended: false }), {where: 'server'});
     };
   }
 
