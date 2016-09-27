@@ -144,9 +144,48 @@ Meteor.startup(() => {
     try {
       var access_token = wxGetAccessToken();
       var menu_url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + access_token;
-      var menu_data = '{"button":[{"type":"view","name":"动态","url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + config.appID + '&redirect_uri=http%3A%2F%2F' + config.url + '%2Fnews&response_type=code&scope=snsapi_userinfo&state=lc#wechat_redirect"},{ "type":"view","name":"课程","url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + config.appID + '&redirect_uri=http%3A%2F%2F' + config.url + '%2Fcourse&response_type=code&scope=snsapi_userinfo&state=lc#wechat_redirect"},{"name":"更多","sub_button":[{"type":"view","name":"课程管理","url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + config.appID + '&redirect_uri=http%3A%2F%2F' + config.url + '%2Fcourse_manage&response_type=code&scope=snsapi_userinfo&state=lc#wechat_redirect"},{"type":"view","name":"联系人","url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + config.appID + '&redirect_uri=http%3A%2F%2F' + config.url + '%2Fcontacts&response_type=code&scope=snsapi_userinfo&state=lc#wechat_redirect"},{"type":"view","name":"发通知","url":"http://' + config.url +'/notify"},{"type":"view","name":"我的名片","url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + config.appID + '&redirect_uri=http%3A%2F%2F' + config.url + '%2Finfo&response_type=code&scope=snsapi_userinfo&state=lc#wechat_redirect"}]}]}';
-      var menu_result = HTTP.post(menu_url,{content: menu_data});
-      res.end("set success" + menu_result.content);
+      var oauth2_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + config.appID + "&response_type=code&scope=snsapi_userinfo&state=lc#wechat_redirect&redirect_uri=";
+      var menu_data = {
+        "button": [
+          {
+            "type": "view",
+            "name": "动态",
+            "url": oauch2_url + encodeURIComponent(config.url + "/news")
+          },
+          {
+            "type": "view",
+            "name": "课程",
+            "url": oauch2_url + encodeURIComponent(config.url + "/course")
+          },
+          {
+            "name": "更多",
+            "sub_button": [
+              {
+                "type": "view",
+                "name": "课程管理",
+                "url": oauch2_url + encodeURIComponent(config.url + "/course_manage")
+              },
+              {
+                "type": "view",
+                "name": "联系人",
+                "url": oauch2_url + encodeURIComponent(config.url + "/contacts")
+              },
+              {
+                "type": "view",
+                "name": "发通知",
+                "url": "http://" + config.url + "/notify"
+              },
+              {
+                "type": "view",
+                "name": "我的名片",
+                "url": oauch2_url + encodeURIComponent(config.url + "/info")
+              }]
+          }]
+      };
+      var menu_json = JSON.stringify(menu_data);
+      var menu_result = HTTP.post(menu_url,{content: menu_json});
+      res.write(menu_json);
+      res.end("set result " + menu_result.content);
     } catch (err) {
       res.end("network error " + err);
     }
