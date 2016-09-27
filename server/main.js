@@ -3,10 +3,29 @@ import { HTTP } from 'meteor/http';
 var config = require("./config.js")
 var Users = new Mongo.Collection('Users');
 var Ids = new Mongo.Collection('Ids');
+var Wx = new Mongo.Collection('Wx');
 var check = [];
 
 Meteor.startup(() => {
   // code to run on server at startup
+
+  function wxGetAccessToken () {
+    var access_token_cache = Wx.findOne({name:'access_token'});
+    if (access_token_cache && access_token_cache.time > Date.now()) {
+      return access_token_cache.value;
+    } else {
+      var token_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + config.appID + "&secret=" + config.appsecret;
+      var token_result = HTTP.get(token_url);
+      var access_token = token_result.data.access_token;
+      var templet_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token;
+      access_token_cache = {};
+      access_token_cache.value = access_token;
+      access_token_cache.name = 'access_token';
+      access_token_cache.time = Date.now() + 7200 * 1000;
+      Wx.insert(access_token_cache);
+      return access_token;
+    }
+  }
 
   if (Meteor.isServer) {
     Router.configureBodyParsers = function () {
@@ -67,7 +86,6 @@ Meteor.startup(() => {
           message.xml.CreateTime = result.xml.CreateTime;
           message.xml.MsgType = "text";
           message.xml.Content = "感谢您的关注";
-          var builder = new xml2js.Builder();
 
           if (!Ids.findOne({name:"user"})) {
             Ids.insert({name:"user", id:0});
@@ -87,9 +105,7 @@ Meteor.startup(() => {
           var teacher = Users.findOne({uid:parseInt(followid)});
           var student = Users.findOne({openid:result.xml.FromUserName[0]});
           
-          var token_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + config.appID + "&secret=" + config.appsecret;
-          var token_result = HTTP.get(token_url);
-          var access_token = token_result.data.access_token;
+          var access_token = wxGetAccessToken();
           var templet_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token;
           var templet_data = '{"touser":"' + teacher.openid + '","template_id":"' + config.follow_templet_id + '","url":"","data":{"text": {"value":"你已被关注' + student.openid + '","color":"#173177"}}}';
           var templet_result = HTTP.post(templet_url, {content: templet_data});
@@ -103,9 +119,7 @@ Meteor.startup(() => {
   Router.route('/setmenu', function () {
     var res = this.response;
     try {
-      var token_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + config.appID + "&secret=" + config.appsecret;
-      var token_result = HTTP.get(token_url);
-      var access_token = token_result.data.access_token;
+      var access_token = wxGetAccessToken();
       var menu_url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + access_token;
       var menu_data = '{"button":[{"type":"view","name":"动态","url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + config.appID + '&redirect_uri=http%3A%2F%2F' + config.url + '%2Fnews&response_type=code&scope=snsapi_userinfo&state=lc#wechat_redirect"},{ "type":"view","name":"课程","url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + config.appID + '&redirect_uri=http%3A%2F%2F' + config.url + '%2Fcourse&response_type=code&scope=snsapi_userinfo&state=lc#wechat_redirect"},{"name":"更多","sub_button":[{"type":"view","name":"课程管理","url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + config.appID + '&redirect_uri=http%3A%2F%2F' + config.url + '%2Fcourse_manage&response_type=code&scope=snsapi_userinfo&state=lc#wechat_redirect"},{"type":"view","name":"联系人","url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + config.appID + '&redirect_uri=http%3A%2F%2F' + config.url + '%2Fcontacts&response_type=code&scope=snsapi_userinfo&state=lc#wechat_redirect"},{"type":"view","name":"发通知","url":"http://' + config.url +'/notify"},{"type":"view","name":"我的名片","url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + config.appID + '&redirect_uri=http%3A%2F%2F' + config.url + '%2Finfo&response_type=code&scope=snsapi_userinfo&state=lc#wechat_redirect"}]}]}';
       var menu_result = HTTP.post(menu_url,{content: menu_data});
@@ -131,9 +145,7 @@ Meteor.startup(() => {
       var userinfo_result = HTTP.get(userinfo_url);
       var userinfo_data = JSON.parse(userinfo_result.content);
 
-      var token_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + config.appID + "&secret=" + config.appsecret;
-      var token_result = HTTP.get(token_url);
-      access_token = token_result.data.access_token;
+      access_token = wxGetAccessToken();
       user = Users.findOne({openid:openid});
       var qrcode_url = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=" + access_token;
       var qrcode_data = '{"expire_seconds": 604800, "action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": ' + user.uid + '}}}';
@@ -172,10 +184,7 @@ Meteor.startup(() => {
         continue;
       }
 
-      var res = this.response;
-      var token_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + config.appID + "&secret=" + config.appsecret;
-      var token_result = HTTP.get(token_url);
-      var access_token = token_result.data.access_token;
+      var access_token = wxGetAccessToken();
       var templet_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token;
       var templet_data = '{"touser":"' + openId + '","template_id":"' + config.notify_templet_id + '","url":"","data":{"first": {"value":"' + infoBegin + '","color":"#173177"},"keyword1":{"value":"' + course + '","color":"#173177"},"keyword2": {"value":"'+teacher+'","color":"#173177"},"keyword3": {"value":"'+time+'","color":"#173177"},"remark":{"value":"'+infoEnd+'","color":"#173177"}}}';
       var templet_result = HTTP.post(templet_url, {content: templet_data});
