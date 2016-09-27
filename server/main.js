@@ -17,7 +17,7 @@ Meteor.startup(() => {
       var token_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + config.appID + "&secret=" + config.appsecret;
       var token_result = HTTP.get(token_url);
       var access_token = token_result.data.access_token;
-      var templet_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token;
+      var template_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token;
       access_token_cache = {};
       access_token_cache.value = access_token;
       access_token_cache.name = 'access_token';
@@ -25,6 +25,19 @@ Meteor.startup(() => {
       Wx.insert(access_token_cache);
       return access_token;
     }
+  }
+
+  function wxSendTemplate(openid, template_id, url, data) {
+    var access_token = wxGetAccessToken();
+    var template_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token;
+    var template_data = {
+      touser: openid,
+      template_id: template_id,
+      url: url,
+      data: data
+    }
+    var template_json = JSON.stringify(template_data);
+    return HTTP.post(template_url, {content: template_json});
   }
 
   if (Meteor.isServer) {
@@ -105,12 +118,20 @@ Meteor.startup(() => {
           var teacher = Users.findOne({uid:parseInt(followid)});
           var student = Users.findOne({openid:result.xml.FromUserName[0]});
           
-          var access_token = wxGetAccessToken();
-          var templet_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token;
-          var templet_data = '{"touser":"' + teacher.openid + '","template_id":"' + config.follow_templet_id + '","url":"","data":{"text": {"value":"你已被关注' + student.openid + '","color":"#173177"}}}';
-          var templet_result = HTTP.post(templet_url, {content: templet_data});
-          var templet_data = '{"touser":"' + student.openid + '","template_id":"' + config.follow_templet_id + '","url":"","data":{"text": {"value":"你已关注' + teacher.openid + '","color":"#173177"}}}';
-          var templet_result = HTTP.post(templet_url, {content: templet_data});
+          var template_data = {
+            text: {
+              value: "你已被关注" + student.openid,
+              color: "#173177"
+            }
+          };
+          wxSendTemplate(teacher.openid, config.follow_template_id, null, template_data);
+          var template_data = {
+            text: {
+              value: "你已关注" + teacher.openid,
+              color: "#173177"
+            }
+          };
+          wxSendTemplate(student.openid, config.follow_template_id, null, template_data);
         }
       }
       this.response.end("");
@@ -184,11 +205,30 @@ Meteor.startup(() => {
         continue;
       }
 
-      var access_token = wxGetAccessToken();
-      var templet_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token;
-      var templet_data = '{"touser":"' + openId + '","template_id":"' + config.notify_templet_id + '","url":"","data":{"first": {"value":"' + infoBegin + '","color":"#173177"},"keyword1":{"value":"' + course + '","color":"#173177"},"keyword2": {"value":"'+teacher+'","color":"#173177"},"keyword3": {"value":"'+time+'","color":"#173177"},"remark":{"value":"'+infoEnd+'","color":"#173177"}}}';
-      var templet_result = HTTP.post(templet_url, {content: templet_data});
-      infomation = templet_result.content;
+      var template_data = {
+        "first": {
+          "value": infoBegin,
+          "color": "#173177"
+        },
+        "keyword1": {
+          "value": course,
+          "color": "#173177"
+        }, 
+        "keyword2": { 
+          "value": teacher, 
+          "color": "#173177" 
+        }, 
+        "keyword3": { 
+          "value": time, 
+          "color": "#173177" 
+        }, 
+        "remark": { 
+          "value": infoEnd, 
+          "color": "#173177" 
+        }
+      };
+      var template_result = wxSendTemplate(openId, config.notify_template_id, null, template_data);
+      infomation = template_result.content;
       res.write(openId);
       res.write("\n")
       res.write(infomation);
