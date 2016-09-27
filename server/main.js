@@ -9,7 +9,7 @@ var check = [];
 Meteor.startup(() => {
   // code to run on server at startup
 
-  function wxGetAccessToken () {
+  function wxGetAccessToken() {
     var access_token_cache = Wx.findOne({name:'access_token'});
     if (access_token_cache && access_token_cache.time > Date.now()) {
       return access_token_cache.value;
@@ -38,6 +38,19 @@ Meteor.startup(() => {
     }
     var template_json = JSON.stringify(template_data);
     return HTTP.post(template_url, {content: template_json});
+  }
+
+  function wxOauth(code) {
+    var oauth2_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=' + config.appID + '&secret=' + config.appsecret + '&code=' + code + '&grant_type=authorization_code';
+    var oauth2_result = HTTP.get(oauth2_url);
+    var oauth2_data = JSON.parse(oauth2_result.content);
+    var openid = oauth2_data.openid;
+    var access_token = oauth2_data.access_token;
+    
+    var userinfo_url = "https://api.weixin.qq.com/sns/userinfo?access_token=" + access_token + "&openid=" + openid;
+    var userinfo_result = HTTP.get(userinfo_url);
+    var userinfo_data = JSON.parse(userinfo_result.content);
+    return userinfo_data;
   }
 
   if (Meteor.isServer) {
@@ -197,18 +210,9 @@ Meteor.startup(() => {
     var code = this.params.query.code;
     var res = this.response;
     try {
-      var oauth2_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=' + config.appID + '&secret=' + config.appsecret + '&code=' + code + '&grant_type=authorization_code';
-      var oauth2_result = HTTP.get(oauth2_url);
-      var oauth2_data = JSON.parse(oauth2_result.content);
-      var openid = oauth2_data.openid;
-      var access_token = oauth2_data.access_token;
-      
-      var userinfo_url = "https://api.weixin.qq.com/sns/userinfo?access_token=" + access_token + "&openid=" + openid;
-      var userinfo_result = HTTP.get(userinfo_url);
-      var userinfo_data = JSON.parse(userinfo_result.content);
-
+      var userinfo_data = wxOauth(code);
       access_token = wxGetAccessToken();
-      user = Users.findOne({openid:openid});
+      user = Users.findOne({openid:userinfo_data.openid});
       var qrcode_url = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=" + access_token;
       var qrcode_data = '{"expire_seconds": 604800, "action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": ' + user.uid + '}}}';
       var qrcode_result = HTTP.post(qrcode_url,{content: qrcode_data});
