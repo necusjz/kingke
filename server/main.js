@@ -4,6 +4,7 @@ var config = require("./config.js")
 var Users = new Mongo.Collection('Users');
 var Ids = new Mongo.Collection('Ids');
 var Wx = new Mongo.Collection('Wx');
+var QrCode = new Mongo.Collection('QrCode');
 var check = [];
 
 Meteor.startup(() => {
@@ -21,7 +22,7 @@ Meteor.startup(() => {
       access_token_cache = {};
       access_token_cache.value = access_token;
       access_token_cache.name = 'access_token';
-      access_token_cache.time = Date.now() + 7200 * 1000;
+      access_token_cache.time = Date.now() + 6000 * 1000;
       Wx.insert(access_token_cache);
       return access_token;
     }
@@ -51,6 +52,34 @@ Meteor.startup(() => {
     var userinfo_result = HTTP.get(userinfo_url);
     var userinfo_data = JSON.parse(userinfo_result.content);
     return userinfo_data;
+  }
+
+  function wxQrcode(id) {
+    var qrcode_cache = QrCode.findOne({qid:id});
+    if (qrcode_cache && qrcode_cache.time > Date.now()) {
+      return qrcode_cache.url;
+    } else {
+      var access_token = wxGetAccessToken();
+      var qrcode_url = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=" + access_token;
+      var qrcode_data = {
+        "expire_seconds": 604800, 
+        "action_name": "QR_SCENE", 
+        "action_info": {
+          "scene": {
+            "scene_id": id
+          }
+        }
+      };
+      qrcode_data = JSON.stringify(qrcode_data);
+      var qrcode_result = HTTP.post(qrcode_url,{content: qrcode_data});
+      var qrcode_json = JSON.parse(qrcode_result.content);
+      var qrcode_img = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + encodeURIComponent(qrcode_json.ticket);
+      var qrcode = {};
+      qrcode_cache.qid = id;
+      qrcode_cache.url = qrcode_img;
+      qrcode_cache.time = Date.now() + 600000 * 1000;
+      QrCode.insert(qrcode_cache);
+    }
   }
 
   if (Meteor.isServer) {
@@ -211,13 +240,8 @@ Meteor.startup(() => {
     var res = this.response;
     try {
       var userinfo_data = wxOauth(code);
-      access_token = wxGetAccessToken();
-      user = Users.findOne({openid:userinfo_data.openid});
-      var qrcode_url = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=" + access_token;
-      var qrcode_data = '{"expire_seconds": 604800, "action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": ' + user.uid + '}}}';
-      var qrcode_result = HTTP.post(qrcode_url,{content: qrcode_data});
-      var qrcode_json = JSON.parse(qrcode_result.content);
-      var qrcode_img = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + encodeURIComponent(qrcode_json.ticket);
+      var user = Users.findOne({openid:userinfo_data.openid});
+      var qrcode_img = wxQrcode(user.uid);
       SSR.compileTemplate('info', Assets.getText('info.html'));
       Template.info.helpers({
         country: userinfo_data.country,
