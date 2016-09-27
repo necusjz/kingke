@@ -48,12 +48,14 @@ Meteor.startup(() => {
       Router.onBeforeAction(
         Iron.Router.bodyParser.raw({
           type: '*/*',
-          only: ['weixin'],
           verify: function(req, res, body) { 
             req.rawBody = body.toString(); 
-          }, 
+          }
+        }),
+        {
+          only: ['weixin'],
           where: 'server'
-        })
+        }
       );
     };
   }
