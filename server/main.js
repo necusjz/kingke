@@ -193,6 +193,7 @@ Meteor.startup(() => {
 
   Router.route("/notifyAns", function () {
     var req = this.request;
+    var res = this.response;
     var openIds = req.body.openIds;
     var infoBegin = req.body.infoBegin;
     var course = req.body.course;
