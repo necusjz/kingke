@@ -150,11 +150,6 @@ Meteor.startup(() => {
           where: 'server'
         }
       );
-      //log
-      Router.onBeforeAction(function(req, res, next) {
-        console.log(req);
-        next();
-      }, {where: 'server'});
     };
   }
 
