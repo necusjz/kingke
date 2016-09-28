@@ -299,7 +299,7 @@ Meteor.startup(() => {
     for (x in followees_id) {
       followees.push(wx.GetUserInfo(followees_id[x].openid));
     }
-    var followers_id = Users.find({openid: userinfo_data.openid}).fetch();
+    var followers_id = Users.findOne({openid: userinfo_data.openid});
     var followers = new Array();
     for (x in followers_id.follower) {
       followers.push(wx.GetUserInfo(followers_id.follower[x]));
