@@ -158,7 +158,7 @@ Meteor.startup(() => {
             Users.insert(user);
           }
         }
-        if (result.xml.EventKey) {
+        if (result.xml.EventKey && (result.xml.Event == "subscribe" || result.xml.Event == "SCAN")) {
           var followid = result.xml.EventKey.join('');
           var teacher = Users.findOne({uid:parseInt(followid)});
           var student = Users.findOne({openid:result.xml.FromUserName[0]});
@@ -241,9 +241,7 @@ Meteor.startup(() => {
     var res = this.response;
     try {
       var userinfo_data = wxOauth(code);
-console.log(userinfo_data.openid);
-var user = Users.findOne({openid:userinfo_data.openid});
-console.log(user);
+      var user = Users.findOne({openid:userinfo_data.openid});
       var qrcode_img = wxQrcode(user.uid);
       SSR.compileTemplate('info', Assets.getText('info.html'));
       Template.info.helpers({
