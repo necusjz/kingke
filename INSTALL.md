@@ -30,6 +30,13 @@ meteor
 ```
 此时你可以在`http://你服务器的ip地址:3000`上看到运行效果
 
+### 查看mongo数据库
+本命令需要在meteor运行的情况下才能使用
+```
+meteor mongo
+use meteor
+```
+
 #### 插件说明
 * jparker:crypto-sha1
     * 提供sha1加密函数，在微信token验证中使用
@@ -43,6 +50,9 @@ meteor
 * http
     * meteor原生api，为项目提供http请求的方法，用于与微信服务器交互
     * [文档地址](https://docs.meteor.com/api/http.html)
+* peerlibrary:xml2js
+    * xml-json互相转换插件
+    * [文档地址](https://github.com/peerlibrary/meteor-xml2js)
 
 ### 为你的ip绑定域名
 1. 因为微信官方为了安全需要，只有绑定域名的服务器才能提供微信后台服务，所以请自己为服务器绑定域名,或向老师寻求帮助。
@@ -68,14 +78,21 @@ PS:如果启动失败，你可以查看错误信息，网上搜索后解决，�
     * 失败则根据页面提示查找bug
 5. 设置消息模板
     * 新增课程模板
-    * 复制模板ID到config.js中
-    * 点击发通知按钮即可发送
+        * 复制模板ID到config.js中
+        * 点击发通知按钮即可发送
+    * 新增关注消息模板
+        * 复制模板ID到config.js中
+
 ```
 {{first.DATA}}
 课程名：{{keyword1.DATA}}
 教师：{{keyword2.DATA}}
 时间：{{keyword3.DATA}}
 {{remark.DATA\}}
+```
+
+```
+{{text.DATA}}
 ```
 
 ## 如果无法在80端口上启动meteor
