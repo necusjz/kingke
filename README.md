@@ -49,5 +49,5 @@ exports.notify_templet_id = "YOUR_TEMPLET_ID"; //你的通知模板ID
 
 * [快速搭建基于meteor的微信公众号开发环境](https://coding.net/u/mengning/p/kingke/git/tree/v0.0.1)
 * [NodeJS](https://nodejs.org/en/)
-* [Meteor](https://www.meteor.com/)
+* [Meteor](https://www.meteor.com/) - [meteor学习笔记](http://www.itjiaoshou.com/meteor-study.html)
 * [React](https://facebook.github.io/react/index.html)
