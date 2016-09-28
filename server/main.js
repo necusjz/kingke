@@ -8,8 +8,7 @@ var QrCode = new Mongo.Collection('QrCode');
 var check = [];
 
 Meteor.startup(() => {
-  // code to run on server at startup
-
+  
   function wxGetAccessToken() {
     var access_token_cache = Wx.findOne({name:'access_token'});
     if (access_token_cache && access_token_cache.time > Date.now()) {
@@ -18,12 +17,18 @@ Meteor.startup(() => {
       var token_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + config.appID + "&secret=" + config.appsecret;
       var token_result = HTTP.get(token_url);
       var access_token = token_result.data.access_token;
-      var template_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token;
-      access_token_cache = {};
-      access_token_cache.value = access_token;
-      access_token_cache.name = 'access_token';
-      access_token_cache.time = Date.now() + 6000 * 1000;
-      Wx.insert(access_token_cache);
+      if (access_token_cache) {
+        Wx.update(access_token_cache._id, {$set: {
+          value: access_token,
+          time: Date.now() + 6000 * 1000
+        }});
+      } else {
+        access_token_cache = {};
+        access_token_cache.value = access_token;
+        access_token_cache.name = 'access_token';
+        access_token_cache.time = Date.now() + 6000 * 1000;
+        Wx.insert(access_token_cache);
+      }
       return access_token;
     }
   }
@@ -74,12 +79,19 @@ Meteor.startup(() => {
       var qrcode_result = HTTP.post(qrcode_url,{content: qrcode_data});
       var qrcode_json = JSON.parse(qrcode_result.content);
       var qrcode_img = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + encodeURIComponent(qrcode_json.ticket);
-      qrcode_cache = {};
-      qrcode_cache.qid = id;
-      qrcode_cache.url = qrcode_img;
-      qrcode_cache.time = Date.now() + 600000 * 1000;
-      QrCode.insert(qrcode_cache);
-      return qrcode_cache.url;
+      if (qrcode_cache) {
+        QrCode.update(qrcode_cache._id, {$set: {
+          url: qrcode_img,
+          time: Date.now() + 600000 * 1000
+        }})
+      } else {
+        qrcode_cache = {};
+        qrcode_cache.qid = id;
+        qrcode_cache.url = qrcode_img;
+        qrcode_cache.time = Date.now() + 600000 * 1000;
+        QrCode.insert(qrcode_cache);
+      }
+      return qrcode_img;
     }
   }
 
