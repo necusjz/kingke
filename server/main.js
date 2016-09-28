@@ -1,10 +1,11 @@
 import { Meteor } from 'meteor/meteor';
 import { HTTP } from 'meteor/http';
-var config = require("./config.js")
-var Users = new Mongo.Collection('Users');
-var Ids = new Mongo.Collection('Ids');
-var Wx = new Mongo.Collection('Wx');
-var QrCode = new Mongo.Collection('QrCode');
+var config = require("./config.js");
+var collection = require("./collection.js");
+var Users = collection.Users;
+var Ids = collection.Ids;
+var Wx = collection.Wx;
+var QrCode = collection.QrCode;
 var check = [];
 
 Meteor.startup(() => {
