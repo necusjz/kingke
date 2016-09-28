@@ -229,9 +229,9 @@ Meteor.startup(() => {
             }
           };
           wxSendTemplate(student.openid, config.follow_template_id, null, template_data);
-
-          var user = Users.findOne({openid:teacher.openid});
-          
+          if (!User.findOne({openid:teacher.openid, follower:student.openid})) {
+            User.update({openid:teacher.openid}, {$push: {follower: student.openid}});
+          }
         }
       }
       this.response.end("");
