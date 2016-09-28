@@ -6,12 +6,6 @@ var Ids = collection.Ids;
 var Wx = collection.Wx;
 var QrCode = collection.QrCode;
 
-exports.GetAccessToken = GetAccessToken
-exports.SendTemplate = SendTemplate
-exports.Oauth = Oauth
-exports.Qrcode = Qrcode
-exports.GetUserInfo = GetUserInfo
-
 var GetAccessToken = function() {
     var access_token_cache = Wx.findOne({name:'access_token'});
     if (access_token_cache && access_token_cache.time > Date.now()) {
@@ -135,3 +129,9 @@ var GetUserInfo = function(openid) {
     }
     return user = Users.findOne({openid:openid});
 }
+
+exports.GetAccessToken = GetAccessToken
+exports.SendTemplate = SendTemplate
+exports.Oauth = Oauth
+exports.Qrcode = Qrcode
+exports.GetUserInfo = GetUserInfo
