@@ -340,8 +340,8 @@ Meteor.startup(() => {
     var openIds = [];
     var receive = req.body.receive;
     if (receive.search(/uid_/) >= 0) {
-      receive.replace(/uid_/, '');
-      user = Users.findOne({uid:receive});
+      receive = receive.replace(/uid_/, '');
+      user = Users.findOne({uid:parseInt(receive)});
       openIds = user.follower;
     } else if (receive.search(/cid_/) >= 0) {
       //TODO add class notify
