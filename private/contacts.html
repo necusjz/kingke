@@ -1,11 +1,47 @@
-
 <html>
+
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>联系人</title>
+  <title>kingke</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css">
 </head>
 
 <body>
-<h1>这里是联系人页面</h1>
+  <div class="container-fluid" style="padding-top: 50px;">
+    <div class="row">
+      <h3>我关注的</h3>
+    </div>
+    <div class="row">
+      {{#each followees}}
+      <div class="col-md-3">
+        <div class="thumbnail" style="text-align:center">
+          <img src="{{headimgurl}}" class="img-rounded" />
+          <div class="caption">
+            <h3>{{nickname}}</h3>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+    <div class="row">
+      <h3>关注我的</h3>
+    </div>
+    <div class="row">
+      {{#each followers}}
+      <div class="col-md-3">
+        <div class="thumbnail" style="text-align:center">
+          <img src="{{headimgurl}}" class="img-rounded" />
+          <div class="caption">
+            <h3>{{nickname}}</h3>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+  <script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 </body>
+
 </html>
