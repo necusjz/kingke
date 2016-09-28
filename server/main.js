@@ -83,6 +83,44 @@ Meteor.startup(() => {
     }
   }
 
+  function wxGetUserInfo(openid) {
+    var user = Users.findOne({openid:openid});
+    if (user && user.nickname) {
+      return user;
+    } else {
+      var access_token = wxGetAccessToken();
+      var userinfo_url = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=" + access_token + "&openid=" + openid + "&lang=zh_CN";
+      var userinfo_result = HTTP.get(userinfo_url);
+      var userinfo_data = JSON.parse(userinfo_result.content);
+      if (user) {
+        Users.update(user._id, {$set: {
+          nickname: userinfo_data.nickname,
+          sex: userinfo_data.sex,
+          language: userinfo_data.language,
+          city: userinfo_data.city,
+          province: userinfo_data.province,
+          country: userinfo_data.country,
+          headimgurl: userinfo_data.headimgurl
+        }});
+      } else {
+        user = {};
+        id = Ids.findOne({"name":"user"});
+        user.uid = id.id + 1;
+        Ids.update({"name":"user"}, {$inc:{id: 1}});
+        user.openid = result.xml.FromUserName[0];
+        user.nickname = userinfo_data.nickname;
+        user.sex = userinfo_data.sex;
+        user.language = userinfo_data.language;
+        user.city = userinfo_data.city;
+        user.province = userinfo_data.province;
+        user.country = userinfo_data.country;
+        user.headimgurl = userinfo_data.headimgurl;
+        Users.insert(user);
+      }
+    }
+    return user = Users.findOne({openid:openid});
+  }
+
   if (Meteor.isServer) {
     Router.configureBodyParsers = function () {
       Router.onBeforeAction(Iron.Router.bodyParser.json());
@@ -161,18 +199,19 @@ Meteor.startup(() => {
         if (result.xml.EventKey && (result.xml.Event == "subscribe" || result.xml.Event == "SCAN")) {
           var followid = result.xml.EventKey.join('');
           var teacher = Users.findOne({uid:parseInt(followid)});
-          var student = Users.findOne({openid:result.xml.FromUserName[0]});
+          teacher = wxGetUserInfo(teacher.openid);
+          var student = wxGetUserInfo(result.xml.FromUserName[0]);
           
           var template_data = {
             text: {
-              value: "你已被关注" + student.openid,
+              value: "你已被关注" + student.nickname,
               color: "#173177"
             }
           };
           wxSendTemplate(teacher.openid, config.follow_template_id, null, template_data);
           var template_data = {
             text: {
-              value: "你已关注" + teacher.openid,
+              value: "你已关注" + teacher.nickname,
               color: "#173177"
             }
           };
