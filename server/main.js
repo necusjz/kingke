@@ -243,18 +243,19 @@ Meteor.startup(() => {
     try {
       var access_token = wxGetAccessToken();
       var menu_url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + access_token;
-      var oauth2_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + config.appID + "&response_type=code&scope=snsapi_userinfo&state=lc#wechat_redirect&redirect_uri=";
+      var oauth2_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + config.appID + "&response_type=code&scope=snsapi_userinfo&state=lc&redirect_uri=";
+      var oauth2_url_end = "#wechat_redirect"
       var menu_data = {
         "button": [
           {
             "type": "view",
             "name": "动态",
-            "url": oauth2_url + encodeURIComponent("http://" + config.url + "/news")
+            "url": oauth2_url + encodeURIComponent("http://" + config.url + "/news") + oauth2_url_end
           },
           {
             "type": "view",
             "name": "课程",
-            "url": oauth2_url + encodeURIComponent("http://" + config.url + "/course")
+            "url": oauth2_url + encodeURIComponent("http://" + config.url + "/course") + oauth2_url_end
           },
           {
             "name": "更多",
@@ -262,22 +263,22 @@ Meteor.startup(() => {
               {
                 "type": "view",
                 "name": "课程管理",
-                "url": oauth2_url + encodeURIComponent("http://" + config.url + "/course_manage")
+                "url": oauth2_url + encodeURIComponent("http://" + config.url + "/course_manage") + oauth2_url_end
               },
               {
                 "type": "view",
                 "name": "联系人",
-                "url": oauth2_url + encodeURIComponent("http://" + config.url + "/contacts")
+                "url": oauth2_url + encodeURIComponent("http://" + config.url + "/contacts") + oauth2_url_end
               },
               {
                 "type": "view",
                 "name": "发通知",
-                "url": oauth2_url + encodeURIComponent("http://" + config.url + "/notify")
+                "url": oauth2_url + encodeURIComponent("http://" + config.url + "/notify") + oauth2_url_end
               },
               {
                 "type": "view",
                 "name": "我的名片",
-                "url": oauth2_url + encodeURIComponent("http://" + config.url + "/info")
+                "url": oauth2_url + encodeURIComponent("http://" + config.url + "/info") + oauth2_url_end
               }]
           }]
       };
