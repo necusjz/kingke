@@ -249,12 +249,12 @@ Meteor.startup(() => {
           {
             "type": "view",
             "name": "动态",
-            "url": oauth2_url + encodeURIComponent(config.url + "/news")
+            "url": oauth2_url + encodeURIComponent("http://" + config.url + "/news")
           },
           {
             "type": "view",
             "name": "课程",
-            "url": oauth2_url + encodeURIComponent(config.url + "/course")
+            "url": oauth2_url + encodeURIComponent("http://" + config.url + "/course")
           },
           {
             "name": "更多",
@@ -262,22 +262,22 @@ Meteor.startup(() => {
               {
                 "type": "view",
                 "name": "课程管理",
-                "url": oauth2_url + encodeURIComponent(config.url + "/course_manage")
+                "url": oauth2_url + encodeURIComponent("http://" + config.url + "/course_manage")
               },
               {
                 "type": "view",
                 "name": "联系人",
-                "url": oauth2_url + encodeURIComponent(config.url + "/contacts")
+                "url": oauth2_url + encodeURIComponent("http://" + config.url + "/contacts")
               },
               {
                 "type": "view",
                 "name": "发通知",
-                "url": oauth2_url + encodeURIComponent(config.url + "/notify")
+                "url": oauth2_url + encodeURIComponent("http://" + config.url + "/notify")
               },
               {
                 "type": "view",
                 "name": "我的名片",
-                "url": oauth2_url + encodeURIComponent(config.url + "/info")
+                "url": oauth2_url + encodeURIComponent("http://" + config.url + "/info")
               }]
           }]
       };
