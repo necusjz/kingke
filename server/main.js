@@ -204,14 +204,14 @@ Meteor.startup(() => {
           
           var template_data = {
             text: {
-              value: "你已被关注" + student.nickname,
+              value: "你已被 " + student.nickname + " 关注",
               color: "#173177"
             }
           };
           wxSendTemplate(teacher.openid, config.follow_template_id, null, template_data);
           var template_data = {
             text: {
-              value: "你已关注" + teacher.nickname,
+              value: "你已关注 " + teacher.nickname,
               color: "#173177"
             }
           };
