@@ -74,11 +74,12 @@ Meteor.startup(() => {
       var qrcode_result = HTTP.post(qrcode_url,{content: qrcode_data});
       var qrcode_json = JSON.parse(qrcode_result.content);
       var qrcode_img = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + encodeURIComponent(qrcode_json.ticket);
-      var qrcode = {};
+      qrcode_cache = {};
       qrcode_cache.qid = id;
       qrcode_cache.url = qrcode_img;
       qrcode_cache.time = Date.now() + 600000 * 1000;
       QrCode.insert(qrcode_cache);
+      return qrcode_cache.url;
     }
   }
 
@@ -240,7 +241,9 @@ Meteor.startup(() => {
     var res = this.response;
     try {
       var userinfo_data = wxOauth(code);
-      var user = Users.findOne({openid:userinfo_data.openid});
+console.log(userinfo_data.openid);
+var user = Users.findOne({openid:userinfo_data.openid});
+console.log(user);
       var qrcode_img = wxQrcode(user.uid);
       SSR.compileTemplate('info', Assets.getText('info.html'));
       Template.info.helpers({
