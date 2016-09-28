@@ -7,7 +7,3 @@ import './main.html';
 Router.route('/', function () {
   this.render('Home');
 });
-
-Router.route('/notify', function () {
-  this.render('Notify');
-});

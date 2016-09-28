@@ -222,7 +222,7 @@ Meteor.startup(() => {
             }
           };
           wxSendTemplate(student.openid, config.follow_template_id, null, template_data);
-          
+
           if (!Users.findOne({openid:teacher.openid, follower:student.openid})) {
             var template_data = {
               text: {
@@ -272,7 +272,7 @@ Meteor.startup(() => {
               {
                 "type": "view",
                 "name": "发通知",
-                "url": "http://" + config.url + "/notify"
+                "url": oauth2_url + encodeURIComponent(config.url + "/notify")
               },
               {
                 "type": "view",
@@ -292,7 +292,6 @@ Meteor.startup(() => {
   
 
   Router.route('/info', function () {
-    var req = this.request;
     var code = this.params.query.code;
     var res = this.response;
     try {
@@ -315,17 +314,37 @@ Meteor.startup(() => {
     }
   }, {where: 'server'});
 
+  Router.route('/notify', function () {
+    var code = this.params.query.code;
+    var userinfo_data = wxOauth(code);
+    var user = Users.findOne({openid:userinfo_data.openid});
+    var res = this.response;
+    SSR.compileTemplate('notify', Assets.getText('notify.html'));
+    Template.notify.helpers({
+      uid: "uid_" + user.uid
+    });
+    var html = SSR.render("notify");
+    res.end(html);
+  }, {where: 'server'});
+
   Router.route("/notifyAns", function () {
     var req = this.request;
     var res = this.response;
-    var openIds = req.body.openIds;
     var infoBegin = req.body.infoBegin;
     var course = req.body.course;
     var teacher = req.body.teacher;
     var infoEnd = req.body.infoEnd;
-    var openIds = openIds.split("\n");
     var nowDate = new Date();
     var time = nowDate.toLocaleDateString() + " "+ nowDate.toLocaleTimeString();
+    var openIds = [];
+    var receive = req.body.receive;
+    if (receive.search(/uid_/) >= 0) {
+      receive.replace(/uid_/, '');
+      user = Users.findOne({uid:receive});
+      openIds = user.follower;
+    } else if (receive.search(/cid_/) >= 0) {
+      //TODO add class notify
+    }
     for (x in openIds) {
       var openId = openIds[x].replace(/^\s+|\s+$/g,"");
       if (openId == "") {
