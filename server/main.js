@@ -217,20 +217,21 @@ Meteor.startup(() => {
           
           var template_data = {
             text: {
-              value: "你已被 " + student.nickname + " 关注",
-              color: "#173177"
-            }
-          };
-          wxSendTemplate(teacher.openid, config.follow_template_id, null, template_data);
-          var template_data = {
-            text: {
               value: "你已关注 " + teacher.nickname,
               color: "#173177"
             }
           };
           wxSendTemplate(student.openid, config.follow_template_id, null, template_data);
-          if (!User.findOne({openid:teacher.openid, follower:student.openid})) {
-            User.update({openid:teacher.openid}, {$push: {follower: student.openid}});
+          
+          if (!Users.findOne({openid:teacher.openid, follower:student.openid})) {
+            var template_data = {
+              text: {
+                value: "你已被 " + student.nickname + " 关注",
+                color: "#173177"
+              }
+            };
+            wxSendTemplate(teacher.openid, config.follow_template_id, null, template_data);
+            Users.update({openid:teacher.openid}, {$push: {follower: student.openid}});
           }
         }
       }
