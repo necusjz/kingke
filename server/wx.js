@@ -6,7 +6,13 @@ var Ids = collection.Ids;
 var Wx = collection.Wx;
 var QrCode = collection.QrCode;
 
-exports.GetAccessToken = function() {
+exports.GetAccessToken = GetAccessToken
+exports.SendTemplate = SendTemplate
+exports.Oauth = Oauth
+exports.Qrcode = Qrcode
+exports.GetUserInfo = GetUserInfo
+
+var GetAccessToken = function() {
     var access_token_cache = Wx.findOne({name:'access_token'});
     if (access_token_cache && access_token_cache.time > Date.now()) {
         return access_token_cache.value;
@@ -30,7 +36,7 @@ exports.GetAccessToken = function() {
     }
 }
 
-exports.SendTemplate = function(openid, template_id, url, data) {
+var SendTemplate = function(openid, template_id, url, data) {
     var access_token = GetAccessToken();
     var template_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token;
     var template_data = {
@@ -43,7 +49,7 @@ exports.SendTemplate = function(openid, template_id, url, data) {
     return HTTP.post(template_url, {content: template_json});
 }
 
-exports.Oauth = function(code) {
+var Oauth = function(code) {
     var oauth2_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=' + config.appID + '&secret=' + config.appsecret + '&code=' + code + '&grant_type=authorization_code';
     var oauth2_result = HTTP.get(oauth2_url);
     var oauth2_data = JSON.parse(oauth2_result.content);
@@ -56,7 +62,7 @@ exports.Oauth = function(code) {
     return userinfo_data;
 }
 
-exports.Qrcode = function(id) {
+var Qrcode = function(id) {
     var qrcode_cache = QrCode.findOne({qid:id});
     if (qrcode_cache && qrcode_cache.time > Date.now()) {
         return qrcode_cache.url;
@@ -92,7 +98,7 @@ exports.Qrcode = function(id) {
     }
 }
 
-exports.GetUserInfo = function(openid) {
+var GetUserInfo = function(openid) {
     var user = Users.findOne({openid:openid});
     if (user && user.nickname) {
         return user;
