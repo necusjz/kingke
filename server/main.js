@@ -8,7 +8,7 @@ var QrCode = new Mongo.Collection('QrCode');
 var check = [];
 
 Meteor.startup(() => {
-  
+
   function wxGetAccessToken() {
     var access_token_cache = Wx.findOne({name:'access_token'});
     if (access_token_cache && access_token_cache.time > Date.now()) {
@@ -210,6 +210,7 @@ Meteor.startup(() => {
         }
         if (result.xml.EventKey && (result.xml.Event == "subscribe" || result.xml.Event == "SCAN")) {
           var followid = result.xml.EventKey.join('');
+          followid = followid.replace(/qrscene_/,"");
           var teacher = Users.findOne({uid:parseInt(followid)});
           teacher = wxGetUserInfo(teacher.openid);
           var student = wxGetUserInfo(result.xml.FromUserName[0]);
@@ -228,6 +229,9 @@ Meteor.startup(() => {
             }
           };
           wxSendTemplate(student.openid, config.follow_template_id, null, template_data);
+
+          var user = Users.findOne({openid:teacher.openid});
+          
         }
       }
       this.response.end("");
