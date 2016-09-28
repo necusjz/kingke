@@ -12,6 +12,7 @@ var GetAccessToken = function() {
         return access_token_cache.value;
     } else {
         var token_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + config.appID + "&secret=" + config.appsecret;
+
         var token_result = HTTP.get(token_url);
         var access_token = token_result.data.access_token;
         if (access_token_cache) {
@@ -116,7 +117,7 @@ var GetUserInfo = function(openid) {
         id = Ids.findOne({"name":"user"});
         user.uid = id.id + 1;
         Ids.update({"name":"user"}, {$inc:{id: 1}});
-        user.openid = result.xml.FromUserName[0];
+        user.openid = openid;
         user.nickname = userinfo_data.nickname;
         user.sex = userinfo_data.sex;
         user.language = userinfo_data.language;

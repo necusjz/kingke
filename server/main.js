@@ -294,24 +294,21 @@ Meteor.startup(() => {
     var res = this.response;
     var code = this.params.query.code;
     var userinfo_data = wx.Oauth(code);
-    var user = Users.findOne({openid:userinfo_data.openid});
-    var followees_id = User.find({follower: userinfo_data.openid});
-    var followees;
+    var followees_id = Users.find({follower: userinfo_data.openid}).fetch();
+    var followees = new Array();
     for (x in followees_id) {
       followees.push(wx.GetUserInfo(followees_id[x].openid));
     }
-    var followers_id = User.find({openid: userinfo_data.openid});
-    var followers;
+    var followers_id = Users.find({openid: userinfo_data.openid}).fetch();
+    var followers = new Array();
     for (x in followers_id.follower) {
       followers.push(wx.GetUserInfo(followers_id.follower[x]));
     }
     SSR.compileTemplate('contacts', Assets.getText('contacts.html'));
-    Template.news.helpers({
+    Template.contacts.helpers({
       followees: followees,
       followers: followers
     });
-    console.log(followees);
-    console.log(followers);
     var html = SSR.render("contacts");
     res.end(html);
   },{where: 'server'});
