@@ -208,7 +208,7 @@ Meteor.startup(() => {
             Users.insert(user);
           }
         }
-        if (result.xml.EventKey && (result.xml.Event == "subscribe" || result.xml.Event == "SCAN")) {
+        if (result.xml.EventKey.join('') && (result.xml.Event == "subscribe" || result.xml.Event == "SCAN")) {
           var followid = result.xml.EventKey.join('');
           followid = followid.replace(/qrscene_/,"");
           var teacher = Users.findOne({uid:parseInt(followid)});
