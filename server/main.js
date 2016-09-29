@@ -6,6 +6,7 @@ var Users = collection.Users;
 var Ids = collection.Ids;
 var wx = require("./wx.js");
 var courseService = require("./course.js");
+var marked = require('marked');
 var check = [];
 
 Meteor.startup(() => {
@@ -327,7 +328,7 @@ Meteor.startup(() => {
     SSR.compileTemplate('course_info', Assets.getText('course_info.html'));
     Template.course_info.helpers({
       name: course.name,
-      info: course.info
+      info: marked(course.info)
     });
     var html = SSR.render("course_info");
     res.end(html);
