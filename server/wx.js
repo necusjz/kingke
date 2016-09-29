@@ -51,7 +51,7 @@ var Oauth = function(code) {
     var openid = oauth2_data.openid;
     var access_token = oauth2_data.access_token;
 
-    var userinfo_url = "https://api.weixin.qq.com/sns/userinfo?access_token=" + access_token + "&openid=" + openid;
+    var userinfo_url = "https://api.weixin.qq.com/sns/userinfo?lang=zh_CN&access_token=" + access_token + "&openid=" + openid;
     var userinfo_result = HTTP.get(userinfo_url);
     var userinfo_data = JSON.parse(userinfo_result.content);
     return userinfo_data;
