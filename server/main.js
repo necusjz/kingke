@@ -293,7 +293,7 @@ Meteor.startup(() => {
     res.end(html);
   },{where: 'server'});
 
-  Router.route('/course_add/:_id', function () {
+  Router.route('/course_add/:_uid', function () {
     var uid = this.params._uid;
     var res = this.response;
     SSR.compileTemplate('course_add', Assets.getText('course_add.html'));
@@ -312,7 +312,9 @@ Meteor.startup(() => {
     console.log(uid);
     console.log(name);
     console.log(info);
-    this.redirect('/course_manage');
+    var res = this.response;
+    res.end("success");
+
   },{where: 'server'});
 
   Router.route('/contacts', function () {
