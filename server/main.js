@@ -1,5 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { HTTP } from 'meteor/http';
+import { Session } from 'meteor/session'
 var config = require("./config.js");
 var collection = require("./collection.js");
 var Users = collection.Users;
@@ -281,12 +282,27 @@ Meteor.startup(() => {
   },{where: 'server'});
 
   Router.route('/course_manage', function () {
+    var code = this.params.query.code;
+    var userinfo_data = wx.Oauth(code);
+    Session.set("openid", userinfo_data.openid);
     var res = this.response;
     SSR.compileTemplate('course_manage', Assets.getText('course_manage.html'));
     Template.course_manage.helpers({
       
     });
     var html = SSR.render("course_manage");
+    res.end(html);
+  },{where: 'server'});
+
+  Router.route('/course_add', function () {
+    var openid = Session.get("openid");
+    console.log(openid);
+    var res = this.response;
+    SSR.compileTemplate('course_add', Assets.getText('course_add.html'));
+    Template.course_add.helpers({
+      
+    });
+    var html = SSR.render("course_add");
     res.end(html);
   },{where: 'server'});
 
