@@ -280,7 +280,7 @@ Meteor.startup(() => {
     res.end(html);
   },{where: 'server'});
 
-  Router.route('/course_manage', function () {
+  Router.route('/course_manage/:_uid', function () {
     var code = this.params.query.code;
     var userinfo_data = wx.Oauth(code);
     var userinfo = wx.GetUserInfo(userinfo_data.openid);
@@ -302,6 +302,17 @@ Meteor.startup(() => {
     });
     var html = SSR.render("course_add");
     res.end(html);
+  },{where: 'server'});
+
+  Router.route('/course_add_form', function () {
+    var req = this.request;
+    var uid = req.body.uid;
+    var name = req.body.name;
+    var info = req.body.info;
+    console.log(uid);
+    console.log(name);
+    console.log(info);
+    this.redirect('/course_manage');
   },{where: 'server'});
 
   Router.route('/contacts', function () {
