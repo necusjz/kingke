@@ -7,8 +7,8 @@
   <link rel="stylesheet" href="/css/weui.min.css" />
 </head>
 
-<body>
-  <form action="/notifyAns" method="post">
+<body style="background-color: #f8f8f8;">
+  <form action="/notifyAns" method="post" id="notify_form">
 
     <div class="weui-cells__title">通知详情</div>
     <div class="weui-cells">
@@ -76,7 +76,7 @@
       </label>
     </div>
 
-    <button type="submit" class="weui_btn weui_btn_primary">通知</button>
+    <a href="javascript:document.getElementById('notify_form').submit();" class="weui-btn weui-btn_primary">通知</a>
   </form>
 </body>
 
