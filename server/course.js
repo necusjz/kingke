@@ -13,5 +13,10 @@ var teacherCourse = function(uid) {
     return Courses.find({uid:uid}).fetch();
 }
 
+var courseInfo = function(id) {
+    return Courses.findOne({_id:id});
+}
+
 exports.saveCourse = saveCourse;
 exports.teacherCourse = teacherCourse;
+exports.courseInfo = courseInfo;

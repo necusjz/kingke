@@ -320,6 +320,19 @@ Meteor.startup(() => {
     res.end("success");
   },{where: 'server'});
 
+  Router.route('/course_info/:_id', function () {
+    var id = this.params._id;
+    var course = courseService.courseInfo(id);
+    var res = this.response;
+    SSR.compileTemplate('course_add', Assets.getText('course_add.html'));
+    Template.course_add.helpers({
+      name: course.name,
+      info: course.info
+    });
+    var html = SSR.render("course_add");
+    res.end(html);
+  },{where: 'server'});
+
   Router.route('/contacts', function () {
     var res = this.response;
     var code = this.params.query.code;
