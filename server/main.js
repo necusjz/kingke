@@ -324,12 +324,12 @@ Meteor.startup(() => {
     var id = this.params._id;
     var course = courseService.courseInfo(id);
     var res = this.response;
-    SSR.compileTemplate('course_add', Assets.getText('course_add.html'));
-    Template.course_add.helpers({
+    SSR.compileTemplate('course_info', Assets.getText('course_info.html'));
+    Template.course_info.helpers({
       name: course.name,
       info: course.info
     });
-    var html = SSR.render("course_add");
+    var html = SSR.render("course_info");
     res.end(html);
   },{where: 'server'});
 
