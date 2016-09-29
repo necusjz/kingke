@@ -289,7 +289,8 @@ Meteor.startup(() => {
     var res = this.response;
     SSR.compileTemplate('course_manage', Assets.getText('course_manage.html'));
     Template.course_manage.helpers({
-      courselist: courselist
+      courselist: courselist,
+      uid: userinfo.uid
     });
     var html = SSR.render("course_manage");
     res.end(html);
