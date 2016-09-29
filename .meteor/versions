@@ -45,6 +45,7 @@ jquery@1.11.9
 launch-screen@1.0.12
 livedata@1.0.18
 logging@1.1.15
+markdown@1.0.10
 meteor@1.2.17
 meteor-base@1.0.4
 meteorhacks:ssr@2.2.0
