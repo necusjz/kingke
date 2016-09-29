@@ -315,6 +315,7 @@ Meteor.startup(() => {
     console.log(uid);
     console.log(name);
     console.log(info);
+    courseService.saveCourse(uid, name, info);
     var res = this.response;
     res.end("success");
   },{where: 'server'});
