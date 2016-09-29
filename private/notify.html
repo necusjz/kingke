@@ -1,56 +1,85 @@
 <html>
+
 <head>
   <title>kingke</title>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+  <link rel="stylesheet" href="/weui/dist/style/weui.min.css" />
 </head>
+
 <body>
-  <div class="container-fluid" style="padding-top: 50px;">
-    <div class="row">
-      <div class="col-md-6 col-md-offset-3 col-xs-12">
-        <form action="/notifyAns" method="post" role="form">
-          <div class="form-group">
-            <label for="infoBegin">通知详情</label>
-            <input type="text" name="infoBegin" id="infoBegin" class="form-control">
-          </div>
-          <div class="form-group">
-            <label for="course">课程名</label>
-            <input type="text" name="course" id="course" placeholder="课程名" class="form-control">
-          </div>
-          <div class="form-group">
-            <label for="teacher">教师</label>
-            <input type="text" name="teacher" id="teacher" placeholder="教师" class="form-control">
-          </div>
-          <div class="form-group">
-            <label for="infoEnd">结尾</label>
-            <input type="text" name="infoEnd" id="infoEnd" placeholder="结尾" class="form-control">
-          </div>
-          
-          <div class="radio">
-            <label>
-              <input type="radio" name="receive" id="receive1" value="{{uid}}" checked>
-              所有粉丝
-            </label>
-          </div>
-          <div class="radio disabled">
-            <label>
-              <input type="radio" name="receive" id="receive2" value="cid_1" disabled>
-              《高级软件工程》所有同学（暂未实现）
-            </label>
-          </div>
-          <div class="radio disabled">
-            <label>
-              <input type="radio" name="receive" id="receive3" value="cid_2" disabled>
-              《C语言》所有同学（暂未实现）
-            </label>
-          </div>
-          <button type="submit" class="btn btn-default">通知</button>
-        </form>
+  <form action="/notifyAns" method="post">
+
+    <div class="weui-cells__title">通知详情</div>
+    <div class="weui-cells">
+      <div class="weui-cell">
+        <div class="weui-cell__bd">
+          <input class="weui-input" type="text" name="infoBegin" id="infoBegin" placeholder="请输入通知详情">
+        </div>
       </div>
     </div>
-  </div>
+
+    <div class="weui-cells__title">课程名</div>
+    <div class="weui-cells">
+      <div class="weui-cell">
+        <div class="weui-cell__bd">
+          <input class="weui-input" type="text" name="course" id="course" placeholder="请输入课程名">
+        </div>
+      </div>
+    </div>
+
+    <div class="weui-cells__title">教师</div>
+    <div class="weui-cells">
+      <div class="weui-cell">
+        <div class="weui-cell__bd">
+          <input class="weui-input" type="text" name="teacher" id="teacher" placeholder="请输入教师">
+        </div>
+      </div>
+    </div>
+
+    <div class="weui-cells__title">结尾</div>
+    <div class="weui-cells">
+      <div class="weui-cell">
+        <div class="weui-cell__bd">
+          <input class="weui-input" type="text" name="infoEnd" id="infoEnd" placeholder="请输入结尾">
+        </div>
+      </div>
+    </div>
+    <div class="weui-cells__title">收件人</div>
+    <div class="weui-cells weui-cells_radio">
+      <label class="weui-cell weui-check__label" for="x11">
+        <div class="weui-cell__bd">
+          <p>所有粉丝</p>
+        </div>
+        <div class="weui-cell__ft">
+          <input type="radio" class="weui-check" name="receive" id="x11" value="{{uid}}"  checked="checked">
+          <span class="weui-icon-checked"></span>
+        </div>
+      </label>
+      <label class="weui-cell weui-check__label" for="x12">
+        <div class="weui-cell__bd">
+          <p>《高级软件工程》所有同学（暂未实现）</p>
+        </div>
+        <div class="weui-cell__ft">
+          <input type="radio" name="receive" class="weui-check" id="x12" value="cid_1">
+          <span class="weui-icon-checked"></span>
+        </div>
+      </label>
+      <label class="weui-cell weui-check__label" for="x13">
+        <div class="weui-cell__bd">
+          <p>《C语言》所有同学（暂未实现）</p>
+        </div>
+        <div class="weui-cell__ft">
+          <input type="radio" name="receive" class="weui-check" id="x13" value="cid_2">
+          <span class="weui-icon-checked"></span>
+        </div>
+      </label>
+    </div>
+
+    <button type="submit" class="weui_btn weui_btn_primary">通知</button>
+  </form>
   <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
   <script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 </body>
+
 </html>
