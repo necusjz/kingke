@@ -5,6 +5,7 @@ var collection = require("./collection.js");
 var Users = collection.Users;
 var Ids = collection.Ids;
 var wx = require("./wx.js");
+var courseService = require("./course.js");
 var check = [];
 
 Meteor.startup(() => {
@@ -280,14 +281,15 @@ Meteor.startup(() => {
     res.end(html);
   },{where: 'server'});
 
-  Router.route('/course_manage/:_uid', function () {
+  Router.route('/course_manage', function () {
     var code = this.params.query.code;
     var userinfo_data = wx.Oauth(code);
     var userinfo = wx.GetUserInfo(userinfo_data.openid);
+    var courselist = courseService.teacherCourse(userinfo.uid);
     var res = this.response;
     SSR.compileTemplate('course_manage', Assets.getText('course_manage.html'));
     Template.course_manage.helpers({
-      uid: userinfo.uid
+      courselist: courselist
     });
     var html = SSR.render("course_manage");
     res.end(html);
@@ -314,7 +316,6 @@ Meteor.startup(() => {
     console.log(info);
     var res = this.response;
     res.end("success");
-
   },{where: 'server'});
 
   Router.route('/contacts', function () {

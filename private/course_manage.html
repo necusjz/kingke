@@ -11,20 +11,15 @@
 
   <div class="weui-cells__title">我的课程</div>
   <div class="weui-cells">
+    {{#each courselist}}
     <a class="weui-cell weui-cell_access" href="javascript:;">
       <div class="weui-cell__bd">
-        <p>高级软件工程</p>
+        <p>{{name}}</p>
       </div>
       <div class="weui-cell__ft">
       </div>
     </a>
-    <a class="weui-cell weui-cell_access" href="javascript:;">
-      <div class="weui-cell__bd">
-        <p>c语言基础</p>
-      </div>
-      <div class="weui-cell__ft">
-      </div>
-    </a>
+    {{/each}}
   </div>
 
   <div class="weui-btn-area">
