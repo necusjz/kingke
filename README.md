@@ -47,7 +47,7 @@ exports.notify_templet_id = "YOUR_TEMPLET_ID"; //你的通知模板ID
 
 ## Links
 
-*[微信UI设计规范](https://mp.weixin.qq.com/debug/wxadoc/design/?t=1475052563066&from=groupmessage&isappinstalled=0#wechat_redirect)
+* [微信UI设计规范](https://mp.weixin.qq.com/debug/wxadoc/design/?t=1475052563066&from=groupmessage&isappinstalled=0#wechat_redirect) - https://weui.io
 * [快速搭建基于meteor的微信公众号开发环境](https://coding.net/u/mengning/p/kingke/git/tree/v0.0.1)
 * [NodeJS官网](https://nodejs.org/en/)
 * [Meteor官网](https://www.meteor.com/) - [meteor学习笔记](http://www.itjiaoshou.com/meteor-study.html)
