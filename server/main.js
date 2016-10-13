@@ -339,8 +339,7 @@ Meteor.startup(() => {
     var name = req.body.name;
     var info = req.body.info;
     chapterService.saveChapter(cid, name, info);
-    var res = this.response;
-    res.end("success");
+    this.redirect('/course_info/' + cid);
   },{where: 'server'});
 
   Router.route('/course_info/:_id', function () {
