@@ -364,10 +364,10 @@ Meteor.startup(() => {
     var course = courseService.courseInfo(id);
     var res = this.response;
     SSR.compileTemplate('course_chapter_info', Assets.getText('course_chapter_info.html'));
-    Template.course_info.helpers({
+    Template.course_chapter_info.helpers({
       info: course.info
     });
-    var html = SSR.render("course_info");
+    var html = SSR.render("course_chapter_info");
     res.end(html);
   },{where: 'server'});
 
