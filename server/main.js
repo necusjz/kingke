@@ -326,10 +326,10 @@ Meteor.startup(() => {
     var cid = this.params._cid;
     var res = this.response;
     SSR.compileTemplate('chapter_add', Assets.getText('chapter_add.html'));
-    Template.course_add.helpers({
+    Template.chapter_add.helpers({
       cid: cid
     });
-    var html = SSR.render("course_add");
+    var html = SSR.render("chapter_add");
     res.end(html);
   },{where: 'server'});
 
