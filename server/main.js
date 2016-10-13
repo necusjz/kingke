@@ -314,9 +314,6 @@ Meteor.startup(() => {
     var uid = req.body.uid;
     var name = req.body.name;
     var info = req.body.info;
-    console.log(uid);
-    console.log(name);
-    console.log(info);
     courseService.saveCourse(parseInt(uid), name, info);
     var res = this.response;
     res.end("success");
