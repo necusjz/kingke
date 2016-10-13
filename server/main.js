@@ -352,7 +352,6 @@ Meteor.startup(() => {
     Template.course_info.helpers({
       name: course.name,
       cid: course._id,
-      info: marked(course.info),
       chapterList: chapterList
     });
     var html = SSR.render("course_info");
@@ -365,7 +364,7 @@ Meteor.startup(() => {
     var res = this.response;
     SSR.compileTemplate('course_chapter_info', Assets.getText('course_chapter_info.html'));
     Template.course_chapter_info.helpers({
-      info: course.info
+      info: marked(course.info)
     });
     var html = SSR.render("course_chapter_info");
     res.end(html);
