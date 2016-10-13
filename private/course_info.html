@@ -9,7 +9,7 @@
 
 <body style="background-color: #f8f8f8;">
 
-  <div class="weui-cells__title">{{name}}</div>
+  <div class="weui-cells__title">课程信息</div>
   <div class="weui-cells">
     <a class="weui-cell weui-cell_access" href="/course_introduction/{{cid}}">
       <div class="weui-cell__bd">
@@ -22,7 +22,7 @@
   <div class="weui-cells__title">章节列表</div>
   <div class="weui-cells">  
     {{#each chapterList}}
-    <a class="weui-cell weui-cell_access" href="/course_info/{{_id}}">
+    <a class="weui-cell weui-cell_access" href="/chapter_info/{{_id}}">
       <div class="weui-cell__bd">
         <p>{{name}}</p>
       </div>

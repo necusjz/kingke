@@ -350,11 +350,22 @@ Meteor.startup(() => {
     var res = this.response;
     SSR.compileTemplate('course_info', Assets.getText('course_info.html'));
     Template.course_info.helpers({
-      name: course.name,
       cid: course._id,
       chapterList: chapterList
     });
     var html = SSR.render("course_info");
+    res.end(html);
+  },{where: 'server'});
+
+  Router.route('/chapter_info/:_id', function () {
+    var id = this.params._id;
+    var chapter = chapterService.chapterInfo(id);
+    var res = this.response;
+    SSR.compileTemplate('course_chapter_info', Assets.getText('course_chapter_info.html'));
+    Template.course_chapter_info.helpers({
+      info: marked(chapter.info)
+    });
+    var html = SSR.render("course_chapter_info");
     res.end(html);
   },{where: 'server'});
 
