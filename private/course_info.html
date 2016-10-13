@@ -1,16 +1,40 @@
 <html>
 
 <head>
-    <title>kingke</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
-    <link rel="stylesheet" href="/css/md.css" />
+  <title>kingke</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+  <link rel="stylesheet" href="/css/weui.min.css" />
 </head>
 
 <body style="background-color: #f8f8f8;">
-    <article class="weui-article">
-        <h1>{{name}}</h1>
-        {{{info}}}
-    </article>
+
+  <div class="weui-cells__title">{{name}}</div>
+  <div class="weui-cells">
+    <a class="weui-cell weui-cell_access" href="/course_introduction/{{cid}}">
+      <div class="weui-cell__bd">
+        <p>课程简介</p>
+      </div>
+      <div class="weui-cell__ft">
+      </div>
+    </a>
+  </div>
+  <div class="weui-cells__title">章节列表</div>
+  <div class="weui-cells">  
+    {{#each chapterList}}
+    <a class="weui-cell weui-cell_access" href="/course_info/{{_id}}">
+      <div class="weui-cell__bd">
+        <p>{{name}}</p>
+      </div>
+      <div class="weui-cell__ft">
+      </div>
+    </a>
+    {{/each}}
+  </div>
+
+  <div class="weui-btn-area">
+    <a href="/chapter_add/{{cid}}" class="weui-btn weui-btn_primary">新增章节</a>
+  </div>
 </body>
+
 </html>

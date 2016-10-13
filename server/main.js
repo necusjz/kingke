@@ -6,6 +6,7 @@ var Users = collection.Users;
 var Ids = collection.Ids;
 var wx = require("./wx.js");
 var courseService = require("./course.js");
+var chapterService = require("./chapter.js");
 var marked = require('marked');
 var check = [];
 
@@ -321,14 +322,50 @@ Meteor.startup(() => {
     res.end("success");
   },{where: 'server'});
 
+  Router.route('/chapter_add/:_cid', function () {
+    var cid = this.params._cid;
+    var res = this.response;
+    SSR.compileTemplate('chapter_add', Assets.getText('chapter_add.html'));
+    Template.course_add.helpers({
+      cid: cid
+    });
+    var html = SSR.render("course_add");
+    res.end(html);
+  },{where: 'server'});
+
+  Router.route('/chapter_add_form', function () {
+    var req = this.request;
+    var cid = req.body.cid;
+    var name = req.body.name;
+    var info = req.body.info;
+    chapterService.saveChapter(cid, name, info);
+    var res = this.response;
+    res.end("success");
+  },{where: 'server'});
+
   Router.route('/course_info/:_id', function () {
     var id = this.params._id;
     var course = courseService.courseInfo(id);
+    var chapterList = chapterService.courseChapters(course._id);
     var res = this.response;
     SSR.compileTemplate('course_info', Assets.getText('course_info.html'));
     Template.course_info.helpers({
       name: course.name,
-      info: marked(course.info)
+      cid: course._id,
+      info: marked(course.info),
+      chapterList: chapterList
+    });
+    var html = SSR.render("course_info");
+    res.end(html);
+  },{where: 'server'});
+
+  Router.route('/course_introduction/:_id', function () {
+    var id = this.params._id;
+    var course = courseService.courseInfo(id);
+    var res = this.response;
+    SSR.compileTemplate('course_chapter_info', Assets.getText('course_chapter_info.html'));
+    Template.course_info.helpers({
+      info: course.info
     });
     var html = SSR.render("course_info");
     res.end(html);
