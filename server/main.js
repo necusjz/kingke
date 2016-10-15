@@ -3,6 +3,7 @@ import { HTTP } from 'meteor/http';
 var config = require("./config.js");
 var collection = require("./collection.js");
 var Users = collection.Users;
+var Courses = collection.Courses;
 var Ids = collection.Ids;
 var wx = require("./wx.js");
 var courseService = require("./course.js");
@@ -90,29 +91,48 @@ Meteor.startup(() => {
           }
         }
         if (result.xml.EventKey && result.xml.EventKey.join('') && (result.xml.Event == "subscribe" || result.xml.Event == "SCAN")) {
-          var followid = result.xml.EventKey.join('');
-          followid = followid.replace(/qrscene_/,"");
-          var teacher = Users.findOne({uid:parseInt(followid)});
-          teacher = wx.GetUserInfo(teacher.openid);
-          var student = wx.GetUserInfo(result.xml.FromUserName[0]);
-          
-          var template_data = {
-            text: {
-              value: "你已关注 " + teacher.nickname,
-              color: "#173177"
-            }
-          };
-          wx.SendTemplate(student.openid, config.follow_template_id, null, template_data);
-
-          if (!Users.findOne({openid:teacher.openid, follower:student.openid})) {
+          var qrcodeid = result.xml.EventKey.join('');
+          qrcodeid = followid.replace(/qrscene_/,"");
+          qrcodeid = parseInt(qrcodeid);
+          if (qrcodeid < 1000000) {
+            var followid = qrcodeid;
+            var teacher = Users.findOne({uid:followid});
+            teacher = wx.GetUserInfo(teacher.openid);
+            var student = wx.GetUserInfo(result.xml.FromUserName[0]);
+            
             var template_data = {
               text: {
-                value: "你已被 " + student.nickname + " 关注",
+                value: "你已关注 " + teacher.nickname,
                 color: "#173177"
               }
             };
-            wx.SendTemplate(teacher.openid, config.follow_template_id, null, template_data);
-            Users.update({openid:teacher.openid}, {$push: {follower: student.openid}});
+            wx.SendTemplate(student.openid, config.follow_template_id, null, template_data);
+
+            if (!Users.findOne({openid:teacher.openid, follower:student.openid})) {
+              var template_data = {
+                text: {
+                  value: "你已被 " + student.nickname + " 关注",
+                  color: "#173177"
+                }
+              };
+              wx.SendTemplate(teacher.openid, config.follow_template_id, null, template_data);
+              Users.update({openid:teacher.openid}, {$push: {follower: student.openid}});
+            }
+          } else {
+            var course = Courses.findOne({qrcodeid:qrcodeid});
+            
+            var template_data = {
+              text: {
+                value: "你已加入《" + course.name + "》",
+                color: "#173177"
+              }
+            };
+            var student = wx.GetUserInfo(result.xml.FromUserName[0]);
+            wx.SendTemplate(
+              student.openid, 
+              config.follow_template_id, 
+              config.url + "/course_info/" + course._id, 
+              template_data);
           }
         }
       }
