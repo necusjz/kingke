@@ -1,11 +1,31 @@
-
 <html>
+
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>动态</title>
+	<title>kingke</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+	<link rel="stylesheet" href="/css/weui.min.css" />
 </head>
 
-<body>
-<h1>这里显示动态</h1>
+<body style="background-color: #f8f8f8;">
+
+	<div class="weui-panel">
+		<div class="weui-panel__hd">我的动态</div>
+		<div class="weui-panel__bd">
+      {{#each newslist}}
+			<div class="weui-media-box weui-media-box_text">
+				<h4 class="weui-media-box__title">{{course}}</h4>
+				<p class="weui-media-box__desc">{{infoBegin}}</p>
+				<p class="weui-media-box__desc">{{infoEnd}}</p>
+				<ul class="weui-media-box__info">
+					<li class="weui-media-box__info__meta">{{time}}</li>
+          <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">{{teacher}}</li>
+				</ul>
+			</div>
+      {{/each}}
+		</div>
+	</div>
+
 </body>
+
 </html>

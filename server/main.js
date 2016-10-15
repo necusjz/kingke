@@ -8,6 +8,7 @@ var Ids = collection.Ids;
 var wx = require("./wx.js");
 var courseService = require("./course.js");
 var chapterService = require("./chapter.js");
+var newsService = require("./news.js");
 var marked = require('marked');
 var check = [];
 
@@ -287,6 +288,7 @@ Meteor.startup(() => {
         }
       };
       var template_result = wx.SendTemplate(openId, config.notify_template_id, url, template_data);
+      newsService.saveNews(openId, infoBegin, course, teacher, time, infoEnd);
       infomation = template_result.content;
       res.write(openId);
       res.write("\n")
@@ -313,8 +315,7 @@ Meteor.startup(() => {
     var res = this.response;
     SSR.compileTemplate('course', Assets.getText('course.html'));
     Template.course.helpers({
-      courselist: courselist,
-      studenturl: "_student"
+      courselist: courselist
     });
     var html = SSR.render("course");
     res.end(html);
