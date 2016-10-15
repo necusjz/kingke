@@ -6,6 +6,7 @@ var saveCourse = function(uid, name, info) {
     course.uid = uid;
     course.name = name;
     course.info = info;
+    //TODO chapter null
     Courses.insert(course);
 }
 
