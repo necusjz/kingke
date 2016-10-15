@@ -255,9 +255,9 @@ Meteor.startup(() => {
       openIds = user.follower;
     } else if (receive && receive.search(/cid_/) >= 0) {
       receive = receive.replace(/cid_/, '');
-      course = courseService.courseInfo(receive);
-      openIds = course.student;
-      url = config.url + "/course_info/" + course._id;
+      var courseinfo = courseService.courseInfo(receive);
+      openIds = courseinfo.student;
+      url = config.url + "/course_info/" + courseinfo._id;
     }
     for (x in openIds) {
       var openId = openIds[x].replace(/^\s+|\s+$/g,"");
