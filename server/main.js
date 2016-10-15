@@ -307,10 +307,13 @@ Meteor.startup(() => {
   },{where: 'server'});
 
   Router.route('/course', function () {
+    var code = this.params.query.code;
+    var userinfo_data = wx.Oauth(code);
+    var courselist = courseService.studentCourse(userinfo_data.openid);
     var res = this.response;
     SSR.compileTemplate('course', Assets.getText('course.html'));
     Template.course.helpers({
-      
+      courselist: courselist
     });
     var html = SSR.render("course");
     res.end(html);
