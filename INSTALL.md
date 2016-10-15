@@ -26,9 +26,9 @@ vim server/config.js
 
 ### 初次启动项目
 ```
-meteor
+sudo meteor --port 80
 ```
-此时你可以在`http://你服务器的ip地址:3000`上看到运行效果
+此时你可以在`http://你服务器的ip地址`上看到运行效果
 
 ### 查看mongo数据库
 本命令需要在meteor运行的情况下才能使用
@@ -83,6 +83,7 @@ PS:如果启动失败，你可以查看错误信息，网上搜索后解决，�
     * 新增关注消息模板
         * 复制模板ID到config.js中
 
+课程模板
 ```
 {{first.DATA}}
 课程名：{{keyword1.DATA}}
@@ -90,7 +91,7 @@ PS:如果启动失败，你可以查看错误信息，网上搜索后解决，�
 时间：{{keyword3.DATA}}
 {{remark.DATA\}}
 ```
-
+关注消息模板
 ```
 {{text.DATA}}
 ```
