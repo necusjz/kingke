@@ -411,6 +411,7 @@ Meteor.startup(() => {
     var res = this.response;
     SSR.compileTemplate('course_info_student', Assets.getText('course_info_student.html'));
     Template.course_info_student.helpers({
+      cid: course._id,
       chapterList: chapterList,
       qrcodeurl: qrcodeurl
     });
