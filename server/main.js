@@ -246,6 +246,7 @@ Meteor.startup(() => {
     var time = nowDate.toLocaleDateString() + " "+ nowDate.toLocaleTimeString();
     var openIds = [];
     var receive = req.body.receive;
+    var url = "";
     //TODO receive undefined
     if (receive && receive.search(/uid_/) >= 0) {
       receive = receive.replace(/uid_/, '');
@@ -255,6 +256,7 @@ Meteor.startup(() => {
       receive = receive.replace(/cid_/, '');
       course = courseService.courseInfo(receive);
       openIds = course.student;
+      url = config.url + "/course_info/" + course._id;
     }
     for (x in openIds) {
       var openId = openIds[x].replace(/^\s+|\s+$/g,"");
@@ -284,7 +286,7 @@ Meteor.startup(() => {
           "color": "#173177" 
         }
       };
-      var template_result = wx.SendTemplate(openId, config.notify_template_id, null, template_data);
+      var template_result = wx.SendTemplate(openId, config.notify_template_id, url, template_data);
       infomation = template_result.content;
       res.write(openId);
       res.write("\n")
