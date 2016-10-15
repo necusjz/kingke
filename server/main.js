@@ -131,7 +131,7 @@ Meteor.startup(() => {
             wx.SendTemplate(
               student.openid, 
               config.follow_template_id, 
-              config.url + "/course_info/" + course._id, 
+              config.url + "/course_info_student/" + course._id, 
               template_data);
 
             if (!Courses.findOne({_id:course._id, student: student.openid})) {
