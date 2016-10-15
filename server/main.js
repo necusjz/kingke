@@ -313,7 +313,8 @@ Meteor.startup(() => {
     var res = this.response;
     SSR.compileTemplate('course', Assets.getText('course.html'));
     Template.course.helpers({
-      courselist: courselist
+      courselist: courselist,
+      studenturl: "_student"
     });
     var html = SSR.render("course");
     res.end(html);
@@ -396,6 +397,24 @@ Meteor.startup(() => {
       qrcodeurl: qrcodeurl
     });
     var html = SSR.render("course_info");
+    res.end(html);
+  },{where: 'server'});
+
+  Router.route('/course_info_student/:_id', function () {
+    var id = this.params._id;
+    var course = courseService.courseInfo(id);
+    if (!course) {
+      return;
+    }
+    var qrcodeurl = wx.Qrcode(course.qrcodeid);
+    var chapterList = chapterService.courseChapters(course._id);
+    var res = this.response;
+    SSR.compileTemplate('course_info_student', Assets.getText('course_info_student.html'));
+    Template.course_info_student.helpers({
+      chapterList: chapterList,
+      qrcodeurl: qrcodeurl
+    });
+    var html = SSR.render("course_info_student");
     res.end(html);
   },{where: 'server'});
 
