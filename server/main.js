@@ -84,6 +84,8 @@ Meteor.startup(() => {
             user.uid = id.id + 1;
             Ids.update({"name":"user"}, {$inc:{id: 1}});
             user.openid = result.xml.FromUserName[0];
+            //TODO user null
+            //TODO refactor user model
             Users.insert(user);
           }
         }
@@ -218,6 +220,7 @@ Meteor.startup(() => {
     var time = nowDate.toLocaleDateString() + " "+ nowDate.toLocaleTimeString();
     var openIds = [];
     var receive = req.body.receive;
+    //TODO receive undefined
     if (receive.search(/uid_/) >= 0) {
       receive = receive.replace(/uid_/, '');
       user = Users.findOne({uid:parseInt(receive)});
@@ -347,6 +350,7 @@ Meteor.startup(() => {
   Router.route('/course_info/:_id', function () {
     var id = this.params._id;
     var course = courseService.courseInfo(id);
+    //TODO _id undefined
     var chapterList = chapterService.courseChapters(course._id);
     var res = this.response;
     SSR.compileTemplate('course_info', Assets.getText('course_info.html'));
