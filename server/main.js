@@ -299,10 +299,13 @@ Meteor.startup(() => {
   }, {where: 'server'});
 
   Router.route('/news', function () {
+    var code = this.params.query.code;
+    var userinfo_data = wx.Oauth(code);
+    var newslist = newsService.userNews(userinfo_data.openid);
     var res = this.response;
     SSR.compileTemplate('news', Assets.getText('news.html'));
     Template.news.helpers({
-      
+      newslist:newslist
     });
     var html = SSR.render("news");
     res.end(html);
