@@ -305,7 +305,7 @@ Meteor.startup(() => {
     var res = this.response;
     SSR.compileTemplate('news', Assets.getText('news.html'));
     Template.news.helpers({
-      newslist:newslist
+      newslist:newslist.reverse()
     });
     var html = SSR.render("news");
     res.end(html);
