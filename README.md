@@ -10,7 +10,7 @@
 * 学生可以收到课程通知
 * 用户（教师和学生）可以查看和编辑个人名片，个人名片中包含个人临时二维码（微信服务号带参数的二维码）
 * 扫描用户个人二维码自动互加联系人，用户可以查看联系人列表
-* 用户可以创建聊天群组，比如教师可以开启课程群，班级所有学生自动加入该群，新加入班级的学生也自动加入班级；用户也可以在联系人列表中选择其他用户创建聊天群组；聊天信息在服务器端存储。用户可以退出聊天群组。
+* 用户可以创建聊天群组，比如创建课程时默认创建课程群，课程的所有学生自动加入该群，新加入课程的学生也自动加入课程群；用户也可以在联系人列表中选择其他用户创建聊天群组；聊天信息在服务器端存储。用户可以退出聊天群组。
 * 课程内容及结构要求
   * 课程必须包含名称、简介（限制300字以内）及目录（即为章节标题的列表链接）；
   * 可以创建多个章节，每个章节都有一个标题和一个markdown格式的可编辑文档；
@@ -48,4 +48,8 @@ exports.follow_template_id = "YOUR_TEMPLET_ID"; //你的关注消息模板ID
 
 ## Links
 
+* [微信UI设计规范](https://mp.weixin.qq.com/debug/wxadoc/design/?t=1475052563066&from=groupmessage&isappinstalled=0#wechat_redirect) - https://weui.io
 * [快速搭建基于meteor的微信公众号开发环境](https://coding.net/u/mengning/p/kingke/git/tree/v0.0.1)
+* [NodeJS官网](https://nodejs.org/en/)
+* [Meteor官网](https://www.meteor.com/) - [meteor学习笔记](http://www.itjiaoshou.com/meteor-study.html)
+* [React官网](https://facebook.github.io/react/index.html) - [一看就懂的ReactJs入门教程（精华版）](http://www.cocoachina.com/webapp/20150721/12692.html)
