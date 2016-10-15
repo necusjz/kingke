@@ -92,7 +92,7 @@ Meteor.startup(() => {
         }
         if (result.xml.EventKey && result.xml.EventKey.join('') && (result.xml.Event == "subscribe" || result.xml.Event == "SCAN")) {
           var qrcodeid = result.xml.EventKey.join('');
-          qrcodeid = followid.replace(/qrscene_/,"");
+          qrcodeid = qrcodeid.replace(/qrscene_/,"");
           qrcodeid = parseInt(qrcodeid);
           if (qrcodeid < 1000000) {
             var followid = qrcodeid;
