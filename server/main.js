@@ -224,10 +224,12 @@ Meteor.startup(() => {
     var code = this.params.query.code;
     var userinfo_data = wx.Oauth(code);
     var user = Users.findOne({openid:userinfo_data.openid});
+    var courselist = courseService.teacherCourse(user.uid);
     var res = this.response;
     SSR.compileTemplate('notify', Assets.getText('notify.html'));
     Template.notify.helpers({
-      uid: "uid_" + user.uid
+      uid: user.uid,
+      courselist: courselist
     });
     var html = SSR.render("notify");
     res.end(html);
@@ -245,12 +247,14 @@ Meteor.startup(() => {
     var openIds = [];
     var receive = req.body.receive;
     //TODO receive undefined
-    if (receive.search(/uid_/) >= 0) {
+    if (receive && receive.search(/uid_/) >= 0) {
       receive = receive.replace(/uid_/, '');
       user = Users.findOne({uid:parseInt(receive)});
       openIds = user.follower;
-    } else if (receive.search(/cid_/) >= 0) {
-      //TODO add class notify
+    } else if (receive && receive.search(/cid_/) >= 0) {
+      receive = receive.replace(/cid_/, '');
+      course = courseService.courseInfo(receive);
+      openIds = course.student;
     }
     for (x in openIds) {
       var openId = openIds[x].replace(/^\s+|\s+$/g,"");
