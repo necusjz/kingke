@@ -133,6 +133,10 @@ Meteor.startup(() => {
               config.follow_template_id, 
               config.url + "/course_info/" + course._id, 
               template_data);
+
+            if (!Courses.findOne({_id:course._id, student: student.openid})) {
+              Courses.update({_id:course._id}, {$push: {student: student.openid}});
+            }
           }
         }
       }
