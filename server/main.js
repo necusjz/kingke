@@ -350,13 +350,17 @@ Meteor.startup(() => {
   Router.route('/course_info/:_id', function () {
     var id = this.params._id;
     var course = courseService.courseInfo(id);
-    //TODO _id undefined
+    if (!course) {
+      return;
+    }
+    var qrcodeurl = wx.Qrcode(course.qrcodeid);
     var chapterList = chapterService.courseChapters(course._id);
     var res = this.response;
     SSR.compileTemplate('course_info', Assets.getText('course_info.html'));
     Template.course_info.helpers({
       cid: course._id,
-      chapterList: chapterList
+      chapterList: chapterList,
+      qrcodeurl: qrcodeurl
     });
     var html = SSR.render("course_info");
     res.end(html);
