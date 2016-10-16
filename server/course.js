@@ -1,4 +1,4 @@
-var collection = require("./collection.js");
+var collection = require('./collection.js');
 var Courses = collection.Courses;
 var Ids = collection.Ids;
 
@@ -7,13 +7,13 @@ var saveCourse = function(uid, name, info) {
   course.uid = uid;
   course.name = name;
   course.info = info;
-  //  TODO chapter null
-  if (!Ids.findOne({ name: "course" })) {
-    Ids.insert({ name: "course", id: 1000000 });
+  // TODO chapter null
+  if (!Ids.findOne({ name: 'course' })) {
+    Ids.insert({ name: 'course', id: 1000000 });
   }
-  id = Ids.findOne({ name: "course" });
+  var id = Ids.findOne({ name: 'course' });
   course.qrcodeid = id.id + 1;
-  Ids.update({ name: "course" }, { $inc: { id: 1 } });
+  Ids.update({ name: 'course' }, { $inc: { id: 1 } });
   Courses.insert(course);
 };
 
