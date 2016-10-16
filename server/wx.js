@@ -16,7 +16,7 @@ var getAccessToken = function() {
   var tokenUrl = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' + config.appID + '&secret=' + config.appsecret;
 
   var tokenResult = HTTP.get(tokenUrl);
-  var accessToken = tokenResult.data.accessToken;
+  var accessToken = tokenResult.data.access_token;
   if (accessTokenCache) {
     Wx.update(accessTokenCache._id, {
       $set: {
