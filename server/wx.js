@@ -133,7 +133,7 @@ var GetUserInfo = function(openid) {
 
 var SetMenu = function() {
     try {
-      var access_token = wx.GetAccessToken();
+      var access_token = GetAccessToken();
       var menu_url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + access_token;
       var oauth2_url_begin = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + config.appID + "&response_type=code&scope=snsapi_userinfo&state=lc&redirect_uri=";
       var oauth2_url_end = "#wechat_redirect"
