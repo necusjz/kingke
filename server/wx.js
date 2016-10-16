@@ -16,16 +16,16 @@ var GetAccessToken = function() {
         var token_result = HTTP.get(token_url);
         var access_token = token_result.data.access_token;
         if (access_token_cache) {
-        Wx.update(access_token_cache._id, {$set: {
-            value: access_token,
-            time: Date.now() + 6000 * 1000
-        }});
+            Wx.update(access_token_cache._id, {$set: {
+                value: access_token,
+                time: Date.now() + 6000 * 1000
+            }});
         } else {
-        access_token_cache = {};
-        access_token_cache.value = access_token;
-        access_token_cache.name = 'access_token';
-        access_token_cache.time = Date.now() + 6000 * 1000;
-        Wx.insert(access_token_cache);
+            access_token_cache = {};
+            access_token_cache.value = access_token;
+            access_token_cache.name = 'access_token';
+            access_token_cache.time = Date.now() + 6000 * 1000;
+            Wx.insert(access_token_cache);
         }
         return access_token;
     }
@@ -131,8 +131,60 @@ var GetUserInfo = function(openid) {
     return user = Users.findOne({openid:openid});
 }
 
+var SetMenu = function() {
+    try {
+      var access_token = wx.GetAccessToken();
+      var menu_url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + access_token;
+      var oauth2_url_begin = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + config.appID + "&response_type=code&scope=snsapi_userinfo&state=lc&redirect_uri=";
+      var oauth2_url_end = "#wechat_redirect"
+      var menu_data = {
+        "button": [
+          {
+            "type": "view",
+            "name": "动态",
+            "url": oauth2_url_begin + encodeURIComponent("http://" + config.url + "/news") + oauth2_url_end
+          },
+          {
+            "type": "view",
+            "name": "课程",
+            "url": oauth2_url_begin + encodeURIComponent("http://" + config.url + "/course") + oauth2_url_end
+          },
+          {
+            "name": "更多",
+            "sub_button": [
+              {
+                "type": "view",
+                "name": "课程管理",
+                "url": oauth2_url_begin + encodeURIComponent("http://" + config.url + "/course_manage") + oauth2_url_end
+              },
+              {
+                "type": "view",
+                "name": "联系人",
+                "url": oauth2_url_begin + encodeURIComponent("http://" + config.url + "/contacts") + oauth2_url_end
+              },
+              {
+                "type": "view",
+                "name": "发通知",
+                "url": oauth2_url_begin + encodeURIComponent("http://" + config.url + "/notify") + oauth2_url_end
+              },
+              {
+                "type": "view",
+                "name": "我的名片",
+                "url": oauth2_url_begin + encodeURIComponent("http://" + config.url + "/info") + oauth2_url_end
+              }]
+          }]
+      };
+      var menu_json = JSON.stringify(menu_data);
+      var menu_result = HTTP.post(menu_url,{content: menu_json});
+      return "[[set menu result]]\n\r" + menu_result.content;
+    } catch (err) {
+      return "[[set menu result ERROR]]\n\r" + err;
+    }
+}
+
 exports.GetAccessToken = GetAccessToken
 exports.SendTemplate = SendTemplate
 exports.Oauth = Oauth
 exports.Qrcode = Qrcode
 exports.GetUserInfo = GetUserInfo
+exports.SetMenu = SetMenu

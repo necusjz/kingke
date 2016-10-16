@@ -15,6 +15,7 @@ var check = [];
 Meteor.startup(() => {
 
   if (Meteor.isServer) {
+    //修改iron:router,以满足xml请求
     Router.configureBodyParsers = function () {
       Router.onBeforeAction(Iron.Router.bodyParser.json());
       Router.onBeforeAction(Iron.Router.bodyParser.urlencoded({extended: false}));
@@ -32,6 +33,9 @@ Meteor.startup(() => {
         }
       );
     };
+
+    //自动设置meteor菜单
+    console.log(wx.SetMenu());
   }
 
   Router.route('/weixin', {where: 'server'},)
@@ -146,55 +150,7 @@ Meteor.startup(() => {
 
   Router.route('/setmenu', function () {
     var res = this.response;
-    try {
-      var access_token = wx.GetAccessToken();
-      var menu_url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + access_token;
-      var oauth2_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + config.appID + "&response_type=code&scope=snsapi_userinfo&state=lc&redirect_uri=";
-      var oauth2_url_end = "#wechat_redirect"
-      var menu_data = {
-        "button": [
-          {
-            "type": "view",
-            "name": "动态",
-            "url": oauth2_url + encodeURIComponent("http://" + config.url + "/news") + oauth2_url_end
-          },
-          {
-            "type": "view",
-            "name": "课程",
-            "url": oauth2_url + encodeURIComponent("http://" + config.url + "/course") + oauth2_url_end
-          },
-          {
-            "name": "更多",
-            "sub_button": [
-              {
-                "type": "view",
-                "name": "课程管理",
-                "url": oauth2_url + encodeURIComponent("http://" + config.url + "/course_manage") + oauth2_url_end
-              },
-              {
-                "type": "view",
-                "name": "联系人",
-                "url": oauth2_url + encodeURIComponent("http://" + config.url + "/contacts") + oauth2_url_end
-              },
-              {
-                "type": "view",
-                "name": "发通知",
-                "url": oauth2_url + encodeURIComponent("http://" + config.url + "/notify") + oauth2_url_end
-              },
-              {
-                "type": "view",
-                "name": "我的名片",
-                "url": oauth2_url + encodeURIComponent("http://" + config.url + "/info") + oauth2_url_end
-              }]
-          }]
-      };
-      var menu_json = JSON.stringify(menu_data);
-      var menu_result = HTTP.post(menu_url,{content: menu_json});
-      res.write(menu_json);
-      res.end("set result " + menu_result.content);
-    } catch (err) {
-      res.end("network error " + err);
-    }
+    res.end(wx.SetMenu());
   }, {where: 'server'});
   
 
