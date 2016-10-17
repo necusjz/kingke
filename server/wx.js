@@ -46,7 +46,7 @@ var getAccessToken = function() {
  * @param  {Object} data template info data
  * @returns {Response} the result of HTTP.post
  */
-var sendTemplate = function(openid, templateId, url, data) {
+exports.sendTemplate = function(openid, templateId, url, data) {
   var accessToken = getAccessToken();
   var templateUrl = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=' + accessToken;
   var templateData = {
@@ -64,7 +64,7 @@ var sendTemplate = function(openid, templateId, url, data) {
  * @param  {String} code weixin oauth2 code
  * @returns {Object} userinfoData
  */
-var oauth = function(code) {
+exports.oauth = function(code) {
   var oauth2Url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=' + config.appID + '&secret=' + config.appsecret + '&code=' + code + '&grant_type=authorization_code';
   var oauth2Result = HTTP.get(oauth2Url);
   var oauth2Data = JSON.parse(oauth2Result.content);
@@ -82,7 +82,7 @@ var oauth = function(code) {
  * @param {int} id QrCode id
  * @returns {String} QrCode picture url
  */
-var qrcode = function(id) {
+exports.qrcode = function(id) {
   var qrcodeCache = QrCode.findOne({ qid: id });
   if (qrcodeCache && qrcodeCache.time > Date.now()) {
     return qrcodeCache.url;
@@ -124,7 +124,7 @@ var qrcode = function(id) {
  * @param {String} openid weixin open id
  * @returns {Object} User info
  */
-var getUserInfo = function(openid) {
+exports.getUserInfo = function(openid) {
   var user = Users.findOne({ openid: openid });
   if (user && user.nickname) {
     return user;
@@ -168,7 +168,7 @@ var getUserInfo = function(openid) {
  * set weixin menu.
  * @returns {String} the result of HTTP.post
  */
-var setMenu = function() {
+exports.setMenu = function() {
   try {
     var accessToken = getAccessToken();
     var menuUrl = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' + accessToken;
@@ -227,7 +227,7 @@ var setMenu = function() {
  * @param  {String} echostr String from weixin
  * @returns {String} success:echostr fail:false
  */
-var checkToken = function(nonce, timestamp, signature, echostr) {
+exports.checkToken = function(nonce, timestamp, signature, echostr) {
   var l = [];
   l[0] = nonce;
   l[1] = timestamp;
@@ -246,7 +246,7 @@ var checkToken = function(nonce, timestamp, signature, echostr) {
  * @param  {String} openid openid from weixin
  * @returns {NULL} NULL
  */
-var addUser = function(openid) {
+exports.addUser = function(openid) {
   if (!Ids.findOne({name: 'user'})) {
     Ids.insert({name: 'user', id: 0});
   }
@@ -267,7 +267,7 @@ var addUser = function(openid) {
  * @param  {String} studentId student openid from weixin
  * @returns {NULL} NULL
  */
-var addFollower = function(teacherId, studentId) {
+exports.addFollower = function(teacherId, studentId) {
   Users.update({openid: teacherId}, {$push: {follower: studentId}});
 };
 
@@ -276,9 +276,9 @@ var addFollower = function(teacherId, studentId) {
  * @param  {int} uid User.uid
  * @returns {Object} User Object
  */
-var getUserInfoByUid = function(uid) {
+exports.getUserInfoByUid = function(uid) {
   var user = Users.findOne({uid: uid});
-  return getUserInfo(user.openid);
+  return exports.getUserInfo(user.openid);
 };
 
 /**
@@ -287,7 +287,7 @@ var getUserInfoByUid = function(uid) {
  * @param  {String} studentId student openid from weixin
  * @returns {boolean} isFollowed
  */
-var isFollowed = function(teacherId, studentId) {
+exports.isFollowed = function(teacherId, studentId) {
   return !!Users.findOne({openid: teacherId, follower: studentId});
 };
 
@@ -296,18 +296,6 @@ var isFollowed = function(teacherId, studentId) {
  * @param  {String} openid user openid
  * @returns {Array} followee list
  */
-var getFollowees = function(openid) {
+exports.getFollowees = function(openid) {
   return Users.find({follower: openid}).fetch();
 };
-
-exports.sendTemplate = sendTemplate;
-exports.oauth = oauth;
-exports.qrcode = qrcode;
-exports.getUserInfo = getUserInfo;
-exports.setMenu = setMenu;
-exports.checkToken = checkToken;
-exports.addUser = addUser;
-exports.addFollower = addFollower;
-exports.getUserInfoByUid = getUserInfoByUid;
-exports.isFollowed = isFollowed;
-exports.getFollowees = getFollowees;

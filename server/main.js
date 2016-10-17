@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 var config = require('./config.js');
-var wx = require('./wx.js');
+var wxService = require('./wx.js');
 var courseService = require('./course.js');
 var chapterService = require('./chapter.js');
 var newsService = require('./news.js');
@@ -29,7 +29,7 @@ Meteor.startup(() => {
     };
 
     // 自动设置meteor菜单
-    var setMenuResponse = wx.setMenu();
+    var setMenuResponse = wxService.setMenu();
     console.log(setMenuResponse);
   }
 
@@ -39,7 +39,7 @@ Meteor.startup(() => {
       var timestamp = this.params.query.timestamp;
       var nonce = this.params.query.nonce;
       var echostr = this.params.query.echostr;
-      var result = wx.checkToken(nonce, timestamp, signature, echostr);
+      var result = wxService.checkToken(nonce, timestamp, signature, echostr);
       var res = this.response;
       res.end(result);
     })
@@ -56,7 +56,7 @@ Meteor.startup(() => {
       if (result.xml && dothing) {
         check.push(repeat);
         if (result.xml.Event[0] === 'subscribe') {
-          wx.addUser(result.xml.FromUserName[0]);
+          wxService.addUser(result.xml.FromUserName[0]);
         }
         if (result.xml.EventKey && result.xml.EventKey.join('') && (result.xml.Event[0] === 'subscribe' || result.xml.Event[0] === 'SCAN')) {
           var qrcodeid = result.xml.EventKey.join('');
@@ -65,8 +65,8 @@ Meteor.startup(() => {
           var templateData;
           if (qrcodeid < 1000000) {
             var followid = qrcodeid;
-            var teacher = wx.getUserInfoByUid(followid);
-            var student = wx.getUserInfo(result.xml.FromUserName[0]);
+            var teacher = wxService.getUserInfoByUid(followid);
+            var student = wxService.getUserInfo(result.xml.FromUserName[0]);
 
             templateData = {
               text: {
@@ -74,17 +74,17 @@ Meteor.startup(() => {
                 color: '#173177'
               }
             };
-            wx.sendTemplate(student.openid, config.follow_template_id, null, templateData);
+            wxService.sendTemplate(student.openid, config.follow_template_id, null, templateData);
 
-            if (!wx.isFollowed(teacher.openid, student.openid)) {
+            if (!wxService.isFollowed(teacher.openid, student.openid)) {
               templateData = {
                 text: {
                   value: '你已被 ' + student.nickname + ' 关注',
                   color: '#173177'
                 }
               };
-              wx.sendTemplate(teacher.openid, config.follow_template_id, null, templateData);
-              wx.addFollower(teacher.openid, student.openid);
+              wxService.sendTemplate(teacher.openid, config.follow_template_id, null, templateData);
+              wxService.addFollower(teacher.openid, student.openid);
             }
           } else {
             var course = courseService.courseInfoByQrcode(qrcodeid);
@@ -95,8 +95,8 @@ Meteor.startup(() => {
                 color: '#173177'
               }
             };
-            student = wx.getUserInfo(result.xml.FromUserName[0]);
-            wx.sendTemplate(
+            student = wxService.getUserInfo(result.xml.FromUserName[0]);
+            wxService.sendTemplate(
               student.openid,
               config.follow_template_id,
               config.url + '/course_info_student/' + course._id,
@@ -113,16 +113,16 @@ Meteor.startup(() => {
 
   Router.route('/setmenu', function() {
     var res = this.response;
-    res.end(wx.setMenu());
+    res.end(wxService.setMenu());
   }, {where: 'server'});
 
   Router.route('/info', function() {
     var code = this.params.query.code;
     var res = this.response;
     try {
-      var userinfoData = wx.oauth(code);
-      var user = wx.getUserInfo(userinfoData.openid);
-      var qrcodeImg = wx.qrcode(user.uid);
+      var userinfoData = wxService.oauth(code);
+      var user = wxService.getUserInfo(userinfoData.openid);
+      var qrcodeImg = wxService.qrcode(user.uid);
       SSR.compileTemplate('info', Assets.getText('info.html'));
       Template.info.helpers({
         country: userinfoData.country,
@@ -141,8 +141,8 @@ Meteor.startup(() => {
 
   Router.route('/notify', function() {
     var code = this.params.query.code;
-    var userinfoData = wx.oauth(code);
-    var user = wx.getUserInfo(userinfoData.openid);
+    var userinfoData = wxService.oauth(code);
+    var user = wxService.getUserInfo(userinfoData.openid);
     var courselist = courseService.teacherCourse(user.uid);
     var res = this.response;
     SSR.compileTemplate('notify', Assets.getText('notify.html'));
@@ -169,7 +169,7 @@ Meteor.startup(() => {
     // TODO receive undefined
     if (receive && receive.search(/uid_/) >= 0) {
       receive = receive.replace(/uid_/, '');
-      var user = wx.getUserInfoByUid(parseInt(receive, 10));
+      var user = wxService.getUserInfoByUid(parseInt(receive, 10));
       openIds = user.follower;
     } else if (receive && receive.search(/cid_/) >= 0) {
       receive = receive.replace(/cid_/, '');
@@ -206,7 +206,7 @@ Meteor.startup(() => {
             'color': '#173177'
           }
         };
-        var templateResult = wx.sendTemplate(openId, config.notify_template_id, url, templateData);
+        var templateResult = wxService.sendTemplate(openId, config.notify_template_id, url, templateData);
         newsService.saveNews(openId, infoBegin, course, teacher, time, infoEnd);
         var infomation = templateResult.content;
         res.write(openId);
@@ -220,7 +220,7 @@ Meteor.startup(() => {
 
   Router.route('/news', function() {
     var code = this.params.query.code;
-    var userinfoData = wx.oauth(code);
+    var userinfoData = wxService.oauth(code);
     var newslist = newsService.userNews(userinfoData.openid);
     var res = this.response;
     SSR.compileTemplate('news', Assets.getText('news.html'));
@@ -233,7 +233,7 @@ Meteor.startup(() => {
 
   Router.route('/course', function() {
     var code = this.params.query.code;
-    var userinfoData = wx.oauth(code);
+    var userinfoData = wxService.oauth(code);
     var courselist = courseService.studentCourse(userinfoData.openid);
     var res = this.response;
     SSR.compileTemplate('course', Assets.getText('course.html'));
@@ -246,8 +246,8 @@ Meteor.startup(() => {
 
   Router.route('/course_manage', function() {
     var code = this.params.query.code;
-    var userinfoData = wx.oauth(code);
-    var userinfo = wx.getUserInfo(userinfoData.openid);
+    var userinfoData = wxService.oauth(code);
+    var userinfo = wxService.getUserInfo(userinfoData.openid);
     var courselist = courseService.teacherCourse(userinfo.uid);
     var res = this.response;
     SSR.compileTemplate('course_manage', Assets.getText('course_manage.html'));
@@ -311,7 +311,7 @@ Meteor.startup(() => {
     if (!course) {
       return;
     }
-    var qrcodeurl = wx.qrcode(course.qrcodeid);
+    var qrcodeurl = wxService.qrcode(course.qrcodeid);
     var chapterList = chapterService.courseChapters(course._id);
     var res = this.response;
     SSR.compileTemplate('course_info', Assets.getText('course_info.html'));
@@ -330,7 +330,7 @@ Meteor.startup(() => {
     if (!course) {
       return;
     }
-    var qrcodeurl = wx.qrcode(course.qrcodeid);
+    var qrcodeurl = wxService.qrcode(course.qrcodeid);
     var chapterList = chapterService.courseChapters(course._id);
     var res = this.response;
     SSR.compileTemplate('course_info_student', Assets.getText('course_info_student.html'));
@@ -370,19 +370,19 @@ Meteor.startup(() => {
   Router.route('/contacts', function() {
     var res = this.response;
     var code = this.params.query.code;
-    var userinfoData = wx.oauth(code);
-    var followeesId = wx.getFollowees(userinfoData.openid);
+    var userinfoData = wxService.oauth(code);
+    var followeesId = wxService.getFollowees(userinfoData.openid);
     var followees = [];
     for (var x in followeesId) {
       if (followeesId.hasOwnProperty(x)) {
-        followees.push(wx.getUserInfo(followeesId[x].openid));
+        followees.push(wxService.getUserInfo(followeesId[x].openid));
       }
     }
-    var followersId = wx.getUserInfo(userinfoData.openid);
+    var followersId = wxService.getUserInfo(userinfoData.openid);
     var followers = [];
     for (var y in followersId.follower) {
       if (followersId.follower.hasOwnProperty(y)) {
-        followers.push(wx.getUserInfo(followersId.follower[y]));
+        followers.push(wxService.getUserInfo(followersId.follower[y]));
       }
     }
     SSR.compileTemplate('contacts', Assets.getText('contacts.html'));

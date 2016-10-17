@@ -11,7 +11,7 @@ var News = collection.News;
  * @param  {String} infoEnd end info
  * @returns {NULL} NULL
  */
-var saveNews = function(openid, infoBegin, course, teacher, time, infoEnd) {
+exports.saveNews = function(openid, infoBegin, course, teacher, time, infoEnd) {
   var news = {};
   news.openid = openid;
   news.infoBegin = infoBegin;
@@ -27,9 +27,6 @@ var saveNews = function(openid, infoBegin, course, teacher, time, infoEnd) {
  * @param  {String} openid User.openid
  * @returns {Array} news list
  */
-var userNews = function(openid) {
+exports.userNews = function(openid) {
   return News.find({ openid: openid }).fetch();
 };
-
-exports.saveNews = saveNews;
-exports.userNews = userNews;

@@ -9,7 +9,7 @@ var Ids = collection.Ids;
  * @param  {String} info course info
  * @returns {NULL} NULL
  */
-var saveCourse = function(uid, name, info) {
+exports.saveCourse = function(uid, name, info) {
   var course = {};
   course.uid = uid;
   course.name = name;
@@ -28,7 +28,7 @@ var saveCourse = function(uid, name, info) {
  * @param  {int} uid User.uid
  * @returns {Array} course list
  */
-var teacherCourse = function(uid) {
+exports.teacherCourse = function(uid) {
   return Courses.find({ uid: uid }).fetch();
 };
 
@@ -37,7 +37,7 @@ var teacherCourse = function(uid) {
  * @param  {String} openid User.openid
  * @returns {Array} course list
  */
-var studentCourse = function(openid) {
+exports.studentCourse = function(openid) {
   return Courses.find({ student: openid }).fetch();
 };
 
@@ -46,7 +46,7 @@ var studentCourse = function(openid) {
  * @param  {String} id Courses._id
  * @returns {Object} course info
  */
-var courseInfo = function(id) {
+exports.courseInfo = function(id) {
   return Courses.findOne({ _id: id });
 };
 
@@ -55,7 +55,7 @@ var courseInfo = function(id) {
  * @param  {String} qrcodeid Courses.qrcodeid
  * @returns {Object} course info
  */
-var courseInfoByQrcode = function(qrcodeid) {
+exports.courseInfoByQrcode = function(qrcodeid) {
   return Courses.findOne({qrcodeid: qrcodeid});
 };
 
@@ -65,7 +65,7 @@ var courseInfoByQrcode = function(qrcodeid) {
  * @param  {String} openid User.openid
  * @returns {boolean} isChooseCourse
  */
-var isChooseCourse = function(courseId, openid) {
+exports.isChooseCourse = function(courseId, openid) {
   return !!Courses.findOne({_id: courseId, student: openid});
 };
 
@@ -75,14 +75,6 @@ var isChooseCourse = function(courseId, openid) {
  * @param  {String} openid User.openid
  * @returns {NULL} NULL
  */
-var chooseCourse = function(courseId, openid) {
+exports.chooseCourse = function(courseId, openid) {
   Courses.update({_id: courseId}, {$push: {student: openid}});
 };
-
-exports.saveCourse = saveCourse;
-exports.teacherCourse = teacherCourse;
-exports.studentCourse = studentCourse;
-exports.courseInfo = courseInfo;
-exports.courseInfoByQrcode = courseInfoByQrcode;
-exports.isChooseCourse = isChooseCourse;
-exports.chooseCourse = chooseCourse;

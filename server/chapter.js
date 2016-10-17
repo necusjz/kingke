@@ -8,7 +8,7 @@ var Chapters = collection.Chapters;
  * @param  {String} info chapter info
  * @returns {NULL} NULL
  */
-var saveChapter = function(cid, name, info) {
+exports.saveChapter = function(cid, name, info) {
   var chapter = {};
   chapter.cid = cid;
   chapter.name = name;
@@ -21,7 +21,7 @@ var saveChapter = function(cid, name, info) {
  * @param  {String} cid Courses._id
  * @returns {Array} chapter list
  */
-var courseChapters = function(cid) {
+exports.courseChapters = function(cid) {
   return Chapters.find({ cid: cid }).fetch();
 };
 
@@ -30,10 +30,6 @@ var courseChapters = function(cid) {
  * @param  {String} id Chapters._id
  * @returns {Object} chapter detail
  */
-var chapterInfo = function(id) {
+exports.chapterInfo = function(id) {
   return Chapters.findOne({ _id: id });
 };
-
-exports.saveChapter = saveChapter;
-exports.courseChapters = courseChapters;
-exports.chapterInfo = chapterInfo;
