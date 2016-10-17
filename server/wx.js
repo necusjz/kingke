@@ -77,6 +77,11 @@ var oauth = function(code) {
   return userinfoData;
 };
 
+/**
+ * create QrCode by weixin API.
+ * @param {int} id QrCode id
+ * @returns {String} QrCode picture url
+ */
 var qrcode = function(id) {
   var qrcodeCache = QrCode.findOne({ qid: id });
   if (qrcodeCache && qrcodeCache.time > Date.now()) {
@@ -114,6 +119,11 @@ var qrcode = function(id) {
   return qrcodeImg;
 };
 
+/**
+ * Use open id get User info. First get from database, then use weixin API.
+ * @param {String} openid weixin open id
+ * @returns {Object} User info
+ */
 var getUserInfo = function(openid) {
   var user = Users.findOne({ openid: openid });
   if (user && user.nickname) {
@@ -154,6 +164,10 @@ var getUserInfo = function(openid) {
   return user;
 };
 
+/**
+ * set weixin menu.
+ * @returns {String} the result of HTTP.post
+ */
 var setMenu = function() {
   try {
     var accessToken = getAccessToken();
@@ -205,7 +219,6 @@ var setMenu = function() {
   }
 };
 
-exports.GetAccessToken = getAccessToken;
 exports.sendTemplate = sendTemplate;
 exports.oauth = oauth;
 exports.qrcode = qrcode;
