@@ -6,6 +6,10 @@ var Ids = collection.Ids;
 var Wx = collection.Wx;
 var QrCode = collection.QrCode;
 
+/**
+ * Get WeiXin Access Token from mongo cache or API.
+ * @returns {String} Access Token
+ */
 var getAccessToken = function() {
   var accessTokenCache = Wx.findOne({ name: 'access_token' });
 
@@ -34,6 +38,14 @@ var getAccessToken = function() {
   return accessToken;
 };
 
+/**
+ * Send Template Message.
+ * @param  {String} openid WeiXin User OpenId
+ * @param  {String} templateId template's' id in config.js
+ * @param  {String} url click url
+ * @param  {Object} data template info data
+ * @returns {Response} the result of HTTP.post
+ */
 var sendTemplate = function(openid, templateId, url, data) {
   var accessToken = getAccessToken();
   var templateUrl = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=' + accessToken;
@@ -47,6 +59,11 @@ var sendTemplate = function(openid, templateId, url, data) {
   return HTTP.post(templateUrl, { content: templateJson });
 };
 
+/**
+ * use oauth get user info
+ * @param  {String} code weixin oauth2 code
+ * @returns {Object} userinfoData
+ */
 var oauth = function(code) {
   var oauth2Url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=' + config.appID + '&secret=' + config.appsecret + '&code=' + code + '&grant_type=authorization_code';
   var oauth2Result = HTTP.get(oauth2Url);

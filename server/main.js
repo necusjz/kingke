@@ -69,7 +69,7 @@ Meteor.startup(() => {
       }
       if (result.xml && dothing) {
         check.push(repeat);
-        if (result.xml.Event === 'subscribe') {
+        if (result.xml.Event[0] === 'subscribe') {
           var message = {};
           message.xml = {};
           message.xml.ToUserName = result.xml.FromUserName;
@@ -93,7 +93,7 @@ Meteor.startup(() => {
             Users.insert(user);
           }
         }
-        if (result.xml.EventKey && result.xml.EventKey.join('') && (result.xml.Event === 'subscribe' || result.xml.Event === 'SCAN')) {
+        if (result.xml.EventKey && result.xml.EventKey.join('') && (result.xml.Event[0] === 'subscribe' || result.xml.Event[0] === 'SCAN')) {
           var qrcodeid = result.xml.EventKey.join('');
           qrcodeid = qrcodeid.replace(/qrscene_/, '');
           qrcodeid = parseInt(qrcodeid, 10);

@@ -170,6 +170,13 @@
     "space-before-function-paren": [2, "never"], // http://eslint.org/docs/rules/space-before-function-paren
     "space-infix-ops": 2,            // http://eslint.org/docs/rules/space-infix-ops
     "spaced-comment": 2,             // http://eslint.org/docs/rules/spaced-comment
-    "no-multi-spaces": 2             // http://eslint.org/docs/rules/no-multi-spaces
-  }
+    "no-multi-spaces": 2,            // http://eslint.org/docs/rules/no-multi-spaces
+    "valid-jsdoc": 2,                // http://eslint.org/docs/rules/valid-jsdoc
+    "require-jsdoc": [2, {           // http://eslint.org/docs/rules/require-jsdoc
+      "require": {
+          "FunctionDeclaration": true,
+          "MethodDefinition": true,
+          "ClassDeclaration": true
+      }}]
+    }
 }
