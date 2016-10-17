@@ -1,6 +1,7 @@
+var wxService = require('./wx.js');
+var collection = require('../models/collection.js');
 var Users = collection.Users;
 var Ids = collection.Ids;
-var wxService = require('./wx.js');
 
 /**
  * Use open id get User info. First get from database, then use weixin API.
