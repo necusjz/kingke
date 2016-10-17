@@ -219,8 +219,85 @@ var setMenu = function() {
   }
 };
 
+/**
+ * check weixin token.
+ * @param  {String} nonce number from weixin
+ * @param  {String} timestamp timestamp from weixin
+ * @param  {String} signature signature from weixin
+ * @param  {String} echostr String from weixin
+ * @returns {String} success:echostr fail:false
+ */
+var checkToken = function(nonce, timestamp, signature, echostr) {
+  var l = [];
+  l[0] = nonce;
+  l[1] = timestamp;
+  l[2] = config.token;
+  l.sort();
+  var original = l.join('');
+  var sha = CryptoJS.SHA1(original).toString();
+  if (signature === sha) {
+    return echostr;
+  }
+  return 'false';
+};
+
+/**
+ * add simple user info.
+ * @param  {String} openid openid from weixin
+ * @returns {NULL} NULL
+ */
+var addUser = function(openid) {
+  if (!Ids.findOne({name: 'user'})) {
+    Ids.insert({name: 'user', id: 0});
+  }
+
+  if (!Users.findOne({openid: openid})) {
+    var user = {};
+    var id = Ids.findOne({'name': 'user'});
+    user.uid = id.id + 1;
+    Ids.update({'name': 'user'}, {$inc: {id: 1}});
+    user.openid = openid;
+    Users.insert(user);
+  }
+};
+
+/**
+ * add follower to teacherId.
+ * @param  {String} teacherId teacher openid from weixin
+ * @param  {String} studentId student openid from weixin
+ * @returns {NULL} NULL
+ */
+var addFollower = function(teacherId, studentId) {
+  Users.update({openid: teacherId}, {$push: {follower: studentId}});
+};
+
+/**
+ * get user info by uid. it used in qrcode.
+ * @param  {int} uid User.uid
+ * @returns {Object} User Object
+ */
+var getUserInfoByUid = function(uid) {
+  var user = Users.findOne({uid: uid});
+  return getUserInfo(user.openid);
+};
+
+/**
+ * check the follow relation.
+ * @param  {String} teacherId teacher openid from weixin
+ * @param  {String} studentId student openid from weixin
+ * @returns {boolean} isFollowed
+ */
+var isFollowed = function(teacherId, studentId) {
+  return !!Users.findOne({openid: teacherId, follower: studentId});
+};
+
 exports.sendTemplate = sendTemplate;
 exports.oauth = oauth;
 exports.qrcode = qrcode;
 exports.getUserInfo = getUserInfo;
 exports.setMenu = setMenu;
+exports.checkToken = checkToken;
+exports.addUser = addUser;
+exports.addFollower = addFollower;
+exports.getUserInfoByUid = getUserInfoByUid;
+exports.isFollowed = isFollowed;

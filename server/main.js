@@ -3,7 +3,6 @@ var config = require('./config.js');
 var collection = require('./collection.js');
 var Users = collection.Users;
 var Courses = collection.Courses;
-var Ids = collection.Ids;
 var wx = require('./wx.js');
 var courseService = require('./course.js');
 var chapterService = require('./chapter.js');
@@ -39,23 +38,13 @@ Meteor.startup(() => {
 
   Router.route('/weixin', {where: 'server'})
     .get(function() {
-      var res = this.response;
       var signature = this.params.query.signature;
       var timestamp = this.params.query.timestamp;
       var nonce = this.params.query.nonce;
       var echostr = this.params.query.echostr;
-      var l = [];
-      l[0] = nonce;
-      l[1] = timestamp;
-      l[2] = config.token;
-      l.sort();
-      var original = l.join('');
-      var sha = CryptoJS.SHA1(original).toString();
-      if (signature === sha) {
-        res.end(echostr);
-      } else {
-        res.end('false');
-      }
+      var result = wx.checkToken(nonce, timestamp, signature, echostr);
+      var res = this.response;
+      res.end(result);
     })
     .post(function() {
       var result = xml2js.parseStringSync(this.request.rawBody);
@@ -70,28 +59,7 @@ Meteor.startup(() => {
       if (result.xml && dothing) {
         check.push(repeat);
         if (result.xml.Event[0] === 'subscribe') {
-          var message = {};
-          message.xml = {};
-          message.xml.ToUserName = result.xml.FromUserName;
-          message.xml.FromUserName = result.xml.ToUserName;
-          message.xml.CreateTime = result.xml.CreateTime;
-          message.xml.MsgType = 'text';
-          message.xml.Content = '感谢您的关注';
-
-          if (!Ids.findOne({name: 'user'})) {
-            Ids.insert({name: 'user', id: 0});
-          }
-
-          if (!Users.findOne({openid: result.xml.FromUserName[0]})) {
-            var user = {};
-            var id = Ids.findOne({'name': 'user'});
-            user.uid = id.id + 1;
-            Ids.update({'name': 'user'}, {$inc: {id: 1}});
-            user.openid = result.xml.FromUserName[0];
-            // TODO user null
-            // TODO refactor user model
-            Users.insert(user);
-          }
+          wx.addUser(result.xml.FromUserName[0]);
         }
         if (result.xml.EventKey && result.xml.EventKey.join('') && (result.xml.Event[0] === 'subscribe' || result.xml.Event[0] === 'SCAN')) {
           var qrcodeid = result.xml.EventKey.join('');
@@ -100,8 +68,7 @@ Meteor.startup(() => {
           var templateData;
           if (qrcodeid < 1000000) {
             var followid = qrcodeid;
-            var teacher = Users.findOne({uid: followid});
-            teacher = wx.getUserInfo(teacher.openid);
+            var teacher = wx.getUserInfoByUid(followid);
             var student = wx.getUserInfo(result.xml.FromUserName[0]);
 
             templateData = {
@@ -112,7 +79,7 @@ Meteor.startup(() => {
             };
             wx.sendTemplate(student.openid, config.follow_template_id, null, templateData);
 
-            if (!Users.findOne({openid: teacher.openid, follower: student.openid})) {
+            if (!wx.isFollowed(teacher.openid, student.openid)) {
               templateData = {
                 text: {
                   value: '你已被 ' + student.nickname + ' 关注',
@@ -120,7 +87,7 @@ Meteor.startup(() => {
                 }
               };
               wx.sendTemplate(teacher.openid, config.follow_template_id, null, templateData);
-              Users.update({openid: teacher.openid}, {$push: {follower: student.openid}});
+              wx.addFollower(teacher.openid, student.openid);
             }
           } else {
             var course = Courses.findOne({qrcodeid: qrcodeid});
@@ -157,7 +124,7 @@ Meteor.startup(() => {
     var res = this.response;
     try {
       var userinfoData = wx.oauth(code);
-      var user = Users.findOne({openid: userinfoData.openid});
+      var user = wx.getUserInfo(userinfoData.openid);
       var qrcodeImg = wx.qrcode(user.uid);
       SSR.compileTemplate('info', Assets.getText('info.html'));
       Template.info.helpers({
@@ -178,7 +145,7 @@ Meteor.startup(() => {
   Router.route('/notify', function() {
     var code = this.params.query.code;
     var userinfoData = wx.oauth(code);
-    var user = Users.findOne({openid: userinfoData.openid});
+    var user = wx.getUserInfo(userinfoData.openid);
     var courselist = courseService.teacherCourse(user.uid);
     var res = this.response;
     SSR.compileTemplate('notify', Assets.getText('notify.html'));
@@ -205,7 +172,7 @@ Meteor.startup(() => {
     // TODO receive undefined
     if (receive && receive.search(/uid_/) >= 0) {
       receive = receive.replace(/uid_/, '');
-      var user = Users.findOne({uid: parseInt(receive, 10)});
+      var user = wx.getUserInfoByUid(parseInt(receive, 10));
       openIds = user.follower;
     } else if (receive && receive.search(/cid_/) >= 0) {
       receive = receive.replace(/cid_/, '');
