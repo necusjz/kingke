@@ -7,7 +7,7 @@ var Ids = collection.Ids;
  * @param  {int} uid User.uid
  * @param  {String} name course name
  * @param  {String} info course info
- * @returns {NULL} NULL
+ * @returns {void}
  */
 exports.saveCourse = function(uid, name, info) {
   var course = {};
@@ -73,7 +73,7 @@ exports.isChooseCourse = function(courseId, openid) {
  * choose course.
  * @param  {String} courseId Courses._id
  * @param  {String} openid User.openid
- * @returns {NULL} NULL
+ * @returns {void}
  */
 exports.chooseCourse = function(courseId, openid) {
   Courses.update({_id: courseId}, {$push: {student: openid}});

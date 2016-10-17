@@ -48,7 +48,7 @@ exports.getUser = function(openid) {
 /**
  * add simple user info.
  * @param  {String} openid openid from weixin
- * @returns {NULL} NULL
+ * @returns {void}
  */
 exports.addUser = function(openid) {
   if (!Ids.findOne({name: 'user'})) {
@@ -69,7 +69,7 @@ exports.addUser = function(openid) {
  * add follower to teacherId.
  * @param  {String} teacherId teacher openid from weixin
  * @param  {String} studentId student openid from weixin
- * @returns {NULL} NULL
+ * @returns {void}
  */
 exports.addFollower = function(teacherId, studentId) {
   Users.update({openid: teacherId}, {$push: {follower: studentId}});

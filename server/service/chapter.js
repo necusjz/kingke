@@ -6,7 +6,7 @@ var Chapters = collection.Chapters;
  * @param  {String} cid Courses._id
  * @param  {String} name chapter name
  * @param  {String} info chapter info
- * @returns {NULL} NULL
+ * @returns {void}
  */
 exports.saveChapter = function(cid, name, info) {
   var chapter = {};

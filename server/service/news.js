@@ -9,7 +9,7 @@ var News = collection.News;
  * @param  {String} teacher teacher name
  * @param  {String} time time
  * @param  {String} infoEnd end info
- * @returns {NULL} NULL
+ * @returns {void}
  */
 exports.saveNews = function(openid, infoBegin, course, teacher, time, infoEnd) {
   var news = {};
