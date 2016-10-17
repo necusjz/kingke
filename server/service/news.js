@@ -1,4 +1,4 @@
-var collection = require('./collection.js');
+var collection = require('../models/collection.js');
 var News = collection.News;
 
 /**

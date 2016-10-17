@@ -1,9 +1,9 @@
 import { Meteor } from 'meteor/meteor';
 var config = require('./config.js');
-var wxService = require('./wx.js');
-var courseService = require('./course.js');
-var chapterService = require('./chapter.js');
-var newsService = require('./news.js');
+var wxService = require('./service/wx.js');
+var courseService = require('./service/course.js');
+var chapterService = require('./service/chapter.js');
+var newsService = require('./service/news.js');
 var marked = require('marked');
 var check = [];
 

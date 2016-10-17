@@ -1,6 +1,6 @@
 import { HTTP } from 'meteor/http';
-var config = require('./config.js');
-var collection = require('./collection.js');
+var config = require('../config.js');
+var collection = require('../models/collection.js');
 var Users = collection.Users;
 var Ids = collection.Ids;
 var Wx = collection.Wx;

@@ -1,4 +1,4 @@
-var collection = require('./collection.js');
+var collection = require('../models/collection.js');
 var Courses = collection.Courses;
 var Ids = collection.Ids;
 
