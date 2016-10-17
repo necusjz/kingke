@@ -291,6 +291,11 @@ var isFollowed = function(teacherId, studentId) {
   return !!Users.findOne({openid: teacherId, follower: studentId});
 };
 
+/**
+ * get my followee.
+ * @param  {String} openid user openid
+ * @returns {Array} followee list
+ */
 var getFollowees = function(openid) {
   return Users.find({follower: openid}).fetch();
 };
