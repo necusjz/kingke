@@ -103,7 +103,7 @@ Meteor.startup(() => {
               config.url + '/course_info_student/' + course._id,
               templateData);
 
-            if (!courseService.isChooseCourse(course._id, openid)) {
+            if (!courseService.isChooseCourse(course._id, student.openid)) {
               courseService.chooseCourse(course._id, student.openid);
             }
           }
