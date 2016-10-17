@@ -1,8 +1,5 @@
 import { Meteor } from 'meteor/meteor';
 var config = require('./config.js');
-var collection = require('./collection.js');
-var Users = collection.Users;
-var Courses = collection.Courses;
 var wx = require('./wx.js');
 var courseService = require('./course.js');
 var chapterService = require('./chapter.js');
@@ -90,7 +87,7 @@ Meteor.startup(() => {
               wx.addFollower(teacher.openid, student.openid);
             }
           } else {
-            var course = Courses.findOne({qrcodeid: qrcodeid});
+            var course = courseService.courseInfoByQrcode(qrcodeid);
 
             templateData = {
               text: {
@@ -105,8 +102,8 @@ Meteor.startup(() => {
               config.url + '/course_info_student/' + course._id,
               templateData);
 
-            if (!Courses.findOne({_id: course._id, student: student.openid})) {
-              Courses.update({_id: course._id}, {$push: {student: student.openid}});
+            if (!courseService.isChooseCourse(course._id, openid)) {
+              courseService.chooseCourse(course._id, student.openid);
             }
           }
         }
@@ -374,14 +371,14 @@ Meteor.startup(() => {
     var res = this.response;
     var code = this.params.query.code;
     var userinfoData = wx.oauth(code);
-    var followeesId = Users.find({follower: userinfoData.openid}).fetch();
+    var followeesId = wx.getFollowees(userinfoData.openid);
     var followees = [];
     for (var x in followeesId) {
       if (followeesId.hasOwnProperty(x)) {
         followees.push(wx.getUserInfo(followeesId[x].openid));
       }
     }
-    var followersId = Users.findOne({openid: userinfoData.openid});
+    var followersId = wx.getUserInfo(userinfoData.openid);
     var followers = [];
     for (var y in followersId.follower) {
       if (followersId.follower.hasOwnProperty(y)) {

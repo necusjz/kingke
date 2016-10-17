@@ -291,6 +291,10 @@ var isFollowed = function(teacherId, studentId) {
   return !!Users.findOne({openid: teacherId, follower: studentId});
 };
 
+var getFollowees = function(openid) {
+  return Users.find({follower: openid}).fetch();
+};
+
 exports.sendTemplate = sendTemplate;
 exports.oauth = oauth;
 exports.qrcode = qrcode;
@@ -301,3 +305,4 @@ exports.addUser = addUser;
 exports.addFollower = addFollower;
 exports.getUserInfoByUid = getUserInfoByUid;
 exports.isFollowed = isFollowed;
+exports.getFollowees = getFollowees;
