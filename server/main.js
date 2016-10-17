@@ -67,7 +67,7 @@ Meteor.startup(() => {
           if (qrcodeid < 1000000) {
             var followid = qrcodeid;
             var teacher = userService.getUserInfoByUid(followid);
-            var student = userService.getUserInfo(result.xml.FromUserName[0]);
+            var student = userService.getUser(result.xml.FromUserName[0]);
 
             templateData = {
               text: {
@@ -96,7 +96,7 @@ Meteor.startup(() => {
                 color: '#173177'
               }
             };
-            student = userService.getUserInfo(result.xml.FromUserName[0]);
+            student = userService.getUser(result.xml.FromUserName[0]);
             wxService.sendTemplate(
               student.openid,
               config.follow_template_id,
@@ -122,7 +122,7 @@ Meteor.startup(() => {
     var res = this.response;
     try {
       var userinfoData = wxService.oauth(code);
-      var user = userService.getUserInfo(userinfoData.openid);
+      var user = userService.getUser(userinfoData.openid);
       var qrcodeImg = wxService.qrcode(user.uid);
       SSR.compileTemplate('info', Assets.getText('info.html'));
       Template.info.helpers({
@@ -143,7 +143,7 @@ Meteor.startup(() => {
   Router.route('/notify', function() {
     var code = this.params.query.code;
     var userinfoData = wxService.oauth(code);
-    var user = userService.getUserInfo(userinfoData.openid);
+    var user = userService.getUser(userinfoData.openid);
     var courselist = courseService.teacherCourse(user.uid);
     var res = this.response;
     SSR.compileTemplate('notify', Assets.getText('notify.html'));
@@ -248,7 +248,7 @@ Meteor.startup(() => {
   Router.route('/course_manage', function() {
     var code = this.params.query.code;
     var userinfoData = wxService.oauth(code);
-    var userinfo = userService.getUserInfo(userinfoData.openid);
+    var userinfo = userService.getUser(userinfoData.openid);
     var courselist = courseService.teacherCourse(userinfo.uid);
     var res = this.response;
     SSR.compileTemplate('course_manage', Assets.getText('course_manage.html'));
@@ -376,14 +376,14 @@ Meteor.startup(() => {
     var followees = [];
     for (var x in followeesId) {
       if (followeesId.hasOwnProperty(x)) {
-        followees.push(userService.getUserInfo(followeesId[x].openid));
+        followees.push(userService.getUser(followeesId[x].openid));
       }
     }
-    var followersId = userService.getUserInfo(userinfoData.openid);
+    var followersId = userService.getUser(userinfoData.openid);
     var followers = [];
     for (var y in followersId.follower) {
       if (followersId.follower.hasOwnProperty(y)) {
-        followers.push(userService.getUserInfo(followersId.follower[y]));
+        followers.push(userService.getUser(followersId.follower[y]));
       }
     }
     SSR.compileTemplate('contacts', Assets.getText('contacts.html'));
