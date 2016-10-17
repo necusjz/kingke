@@ -1,8 +1,6 @@
 import { HTTP } from 'meteor/http';
 var config = require('../config.js');
 var collection = require('../models/collection.js');
-var Users = collection.Users;
-var Ids = collection.Ids;
 var Wx = collection.Wx;
 var QrCode = collection.QrCode;
 
@@ -125,43 +123,11 @@ exports.qrcode = function(id) {
  * @returns {Object} User info
  */
 exports.getUserInfo = function(openid) {
-  var user = Users.findOne({ openid: openid });
-  if (user && user.nickname) {
-    return user;
-  }
   var accessToken = getAccessToken();
   var userinfoUrl = 'https://api.weixin.qq.com/cgi-bin/user/info?access_token=' + accessToken + '&openid=' + openid + '&lang=zh_CN';
   var userinfoResult = HTTP.get(userinfoUrl);
   var userinfoData = JSON.parse(userinfoResult.content);
-  if (user) {
-    Users.update(user._id, {
-      $set: {
-        nickname: userinfoData.nickname,
-        sex: userinfoData.sex,
-        language: userinfoData.language,
-        city: userinfoData.city,
-        province: userinfoData.province,
-        country: userinfoData.country,
-        headimgurl: userinfoData.headimgurl
-      }
-    });
-  } else {
-    user = {};
-    var id = Ids.findOne({ 'name': 'user' });
-    user.uid = id.id + 1;
-    Ids.update({ 'name': 'user' }, { $inc: { id: 1 } });
-    user.openid = openid;
-    user.nickname = userinfoData.nickname;
-    user.sex = userinfoData.sex;
-    user.language = userinfoData.language;
-    user.city = userinfoData.city;
-    user.province = userinfoData.province;
-    user.country = userinfoData.country;
-    user.headimgurl = userinfoData.headimgurl;
-    Users.insert(user);
-  }
-  user = Users.findOne({ openid: openid });
-  return user;
+  return userinfoData;
 };
 
 /**
@@ -239,63 +205,4 @@ exports.checkToken = function(nonce, timestamp, signature, echostr) {
     return echostr;
   }
   return 'false';
-};
-
-/**
- * add simple user info.
- * @param  {String} openid openid from weixin
- * @returns {NULL} NULL
- */
-exports.addUser = function(openid) {
-  if (!Ids.findOne({name: 'user'})) {
-    Ids.insert({name: 'user', id: 0});
-  }
-
-  if (!Users.findOne({openid: openid})) {
-    var user = {};
-    var id = Ids.findOne({'name': 'user'});
-    user.uid = id.id + 1;
-    Ids.update({'name': 'user'}, {$inc: {id: 1}});
-    user.openid = openid;
-    Users.insert(user);
-  }
-};
-
-/**
- * add follower to teacherId.
- * @param  {String} teacherId teacher openid from weixin
- * @param  {String} studentId student openid from weixin
- * @returns {NULL} NULL
- */
-exports.addFollower = function(teacherId, studentId) {
-  Users.update({openid: teacherId}, {$push: {follower: studentId}});
-};
-
-/**
- * get user info by uid. it used in qrcode.
- * @param  {int} uid User.uid
- * @returns {Object} User Object
- */
-exports.getUserInfoByUid = function(uid) {
-  var user = Users.findOne({uid: uid});
-  return exports.getUserInfo(user.openid);
-};
-
-/**
- * check the follow relation.
- * @param  {String} teacherId teacher openid from weixin
- * @param  {String} studentId student openid from weixin
- * @returns {boolean} isFollowed
- */
-exports.isFollowed = function(teacherId, studentId) {
-  return !!Users.findOne({openid: teacherId, follower: studentId});
-};
-
-/**
- * get my followee.
- * @param  {String} openid user openid
- * @returns {Array} followee list
- */
-exports.getFollowees = function(openid) {
-  return Users.find({follower: openid}).fetch();
 };
