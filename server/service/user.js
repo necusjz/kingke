@@ -27,8 +27,11 @@ exports.getUser = function(openid) {
       }
     });
   } else {
-    user = {};
+    if (!Ids.findOne({name: 'user'})) {
+      Ids.insert({name: 'user', id: 0});
+    }
     var id = Ids.findOne({ 'name': 'user' });
+    user = {};
     user.uid = id.id + 1;
     Ids.update({ 'name': 'user' }, { $inc: { id: 1 } });
     user.openid = openid;
