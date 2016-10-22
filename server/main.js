@@ -167,7 +167,6 @@ Meteor.startup(() => {
     var openIds = [];
     var receive = req.body.receive;
     var url = '';
-    // TODO receive undefined
     if (receive && receive.search(/uid_/) >= 0) {
       receive = receive.replace(/uid_/, '');
       var user = userService.getUserInfoByUid(parseInt(receive, 10));
