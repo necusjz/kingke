@@ -134,3 +134,6 @@ sudo vim /etc/nginx/nginx.conf
 ```
 sudo service nginx restart
 ```
+
+## 编写代码
+在写完代码后，建议使用(eslint)[http://eslint.org/]进行代码检查，确认无错再提交
