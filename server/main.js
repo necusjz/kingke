@@ -175,7 +175,7 @@ Meteor.startup(() => {
       receive = receive.replace(/cid_/, '');
       var courseinfo = courseService.courseInfo(receive);
       openIds = courseinfo.student;
-      url = config.url + '/course_info/' + courseinfo._id;
+      url = config.url + '/course_info_student/' + courseinfo._id;
     }
     for (var x in openIds) {
       if (openIds.hasOwnProperty(x)) {
