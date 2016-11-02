@@ -1,6 +1,6 @@
 import './chat.html';
-
-Messages = new Mongo.Collection('messages');
+var collection = require('../collection/message.js');
+var Messages = collection.Messages;
 
 Router.route('/chat', function() {
   Template.messages.helpers({
