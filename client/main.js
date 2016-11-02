@@ -1,5 +1,4 @@
 import './main.html';
-import './chat.html';
 var collection = require('../collection/message.js');
 var Messages = collection.Messages;
 
@@ -33,7 +32,7 @@ sendMessage = function() {
 };
 
 Template.Chat.events = {
-  'keydown chat#message': function(event) {
+  'keydown input#message': function(event) {
     if (event.which === 13) {
       sendMessage();
     }
