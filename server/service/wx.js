@@ -145,7 +145,7 @@ exports.setMenu = function() {
         {
           'type': 'view',
           'name': '动态',
-          'url': oauth2UrlBegin + encodeURIComponent('http://' + config.url + '/news') + oauth2UrlEnd
+          'url': 'http://' + config.url + '/chat'
         },
         {
           'type': 'view',
@@ -168,7 +168,7 @@ exports.setMenu = function() {
             {
               'type': 'view',
               'name': '发通知',
-              'url': 'http://' + config.url + '/chat'
+              'url': oauth2UrlBegin + encodeURIComponent('http://' + config.url + '/notify') + oauth2UrlEnd
             },
             {
               'type': 'view',
