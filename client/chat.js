@@ -11,7 +11,7 @@ Template.messages.helpers({
   }
 });
 
-var sendMessage = function() {
+sendMessage = function() {
   var name = '陌生人';
   var message = document.getElementById('message');
   if (message.value !== '') {
