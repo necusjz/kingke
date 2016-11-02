@@ -31,8 +31,5 @@ Template.input.events = {
     if (event.which === 13) {
       sendMessage();
     }
-  },
-  'click input#btn': function() {
-    sendMessage();
   }
 };
