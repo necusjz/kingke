@@ -43,6 +43,7 @@ sudo meteor --port 80
   * 接口配置url类似http://your.domain.name/weixin
   * 接口配置token自己定义,与项目配置文件server/config.js填写一致即可
   * 体验接口权限表-网页服务-网页帐号-网页授权获取用户基本信息-修改，只填写域名，比如your.domain.name
+  * 创建消息模板，模板参见[INSTALL.md](https://coding.net/u/mengning/p/kingke/git/blob/master/INSTALL.md)
 * 修改配置文件server/config.js
 ```
 //Warning!!!
