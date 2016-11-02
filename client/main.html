@@ -12,3 +12,28 @@
   <h1>hello everyone</h1>
   <a class="btn btn-default" href="/setmenu">设置菜单按钮</a>
 </template>
+
+<template name="Chat">
+  <div class="weui-cells__title">聊天室</div>
+	<div class="weui-cells weui-cells_form">
+		<div class="weui-cell weui-cell_vcode">
+			<div class="weui-cell__hd">
+				<label class="weui-label">消息</label>
+			</div>
+			<div class="weui-cell__bd">
+				<input class="weui-input" id="message" type="text">
+			</div>
+			<div class="weui-cell__ft">
+				<a href="javascript:sendMessage();" class="weui-vcode-btn">发送</a>
+			</div>
+		</div>
+	</div>
+  
+  <div class="page__bd">
+    <article class="weui-article">
+    {{#each messages}}
+      <p><strong>{{name}}:</strong> {{message}}</p>
+    {{/each}}
+    </article>
+  </div>
+</template>
