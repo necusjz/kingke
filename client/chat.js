@@ -3,6 +3,8 @@ var collection = require('../collection/message.js');
 var Messages = collection.Messages;
 
 Router.route('/chat', function() {
+  this.render('input');
+  this.render('messages');
 });
 
 Template.messages.helpers({
