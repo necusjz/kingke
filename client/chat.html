@@ -1,26 +1,38 @@
 <head>
-  <title>Meteor Chat Application.</title>
+  <title>chat room</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+  <link rel="stylesheet" href="/css/weui.min.css" />
 </head>
 
-<body>  
-  <h1>Chatapp</h1>
-  {{> welcome }}
+<body style="background-color: #f8f8f8;">
+  <div class="weui-cells__title">聊天室</div>
   {{> input }}
   {{> messages }}
 </body>
 
-<template name="welcome">
-  <p>
-    Let's chat.
-  </p>
-</template>
-
 <template name="messages">
-  {{#each messages}}
-    <strong>{{name}}:</strong> {{message}}<br>
-  {{/each}}
+  <div class="page__bd">
+    <article class="weui-article">
+    {{#each messages}}
+      <p><strong>{{name}}:</strong> {{message}}</p>
+    {{/each}}
+    </article>
+  </div>
 </template>
 
 <template name="input">
-  <p>Message: <input type="text" id="message"></p>
+	<div class="weui-cells weui-cells_form">
+		<div class="weui-cell weui-cell_vcode">
+			<div class="weui-cell__hd">
+				<label class="weui-label">消息</label>
+			</div>
+			<div class="weui-cell__bd">
+				<input class="weui-input" id="message" type="text">
+			</div>
+			<div class="weui-cell__ft">
+				<a href="javascript:;" class="weui-vcode-btn">发送</a>
+			</div>
+		</div>
+	</div>
 </template>
