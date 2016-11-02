@@ -168,7 +168,7 @@ exports.setMenu = function() {
             {
               'type': 'view',
               'name': '发通知',
-              'url': oauth2UrlBegin + encodeURIComponent('http://' + config.url + '/notify') + oauth2UrlEnd
+              'url': 'http://' + config.url + '/chat'
             },
             {
               'type': 'view',
