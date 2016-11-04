@@ -22,7 +22,10 @@ var getAccessToken = function() {
 
   // check is access token is right.
   if (!accessToken) {
+    console.log("[[appID or appsecret ERROR, check your config.js]]");
+    console.log("--- error message begin ----");
     console.log(tokenResult.data);
+    console.log("--- error message end ----");
     return "";
   }
 
