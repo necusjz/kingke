@@ -19,6 +19,13 @@ var getAccessToken = function() {
 
   var tokenResult = HTTP.get(tokenUrl);
   var accessToken = tokenResult.data.access_token;
+
+  // check is access token is right.
+  if (!accessToken) {
+    console.log(tokenResult.data);
+    return "";
+  }
+
   if (accessTokenCache) {
     Wx.update(accessTokenCache._id, {
       $set: {
