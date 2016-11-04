@@ -3,6 +3,7 @@ var config = require('../config.js');
 var collection = require('../models/collection.js');
 var Wx = collection.Wx;
 var QrCode = collection.QrCode;
+var check = [];
 
 /**
  * Get WeiXin Access Token from mongo cache or API.
@@ -215,4 +216,211 @@ exports.checkToken = function(nonce, timestamp, signature, echostr) {
     return echostr;
   }
   return 'false';
+};
+
+/**
+ * 默认空函数.
+ * @param  {Object} xml 推送XML数据包
+ * @returns {void}
+ */
+var noop = function(xml) {
+  if (xml.MsgType[0] === 'event') {
+    console.log("[[[ " + xml.Event[0] + " is not implement]]]");
+  } else {
+    console.log("[[[ " + xml.MsgType[0] + " is not implement]]]");
+  }
+};
+
+/**
+ * receive message callback.
+ * @param  {Object} xml 推送XML数据包
+ * @param  {function} text=noop 文本消息
+ * @param  {function} image=noop 图片消息
+ * @param  {function} voice=noop 语音消息
+ * @param  {function} video=noop 视频消息
+ * @param  {function} shortvideo=noop 小视频消息
+ * @param  {function} location=noop 地理位置消息
+ * @param  {function} link=noop 链接消息
+ * @param  {function} subscribe=noop 关注事件
+ * @param  {function} unsubscribe=noop 取消关注事件
+ * @param  {function} qrcode=noop 扫描带参数二维码事件
+ * @param  {function} eventLocation=noop 上报地理位置事件
+ * @param  {function} click=noop 自定义菜单事件-点击菜单拉取消息时的事件推送
+ * @param  {function} view=noop 自定义菜单事件-点击菜单跳转链接时的事件推送
+ * @returns {void}
+ */
+exports.receiveMessage = function(
+  xml,
+  text = noop,
+  image = noop,
+  voice = noop,
+  video = noop,
+  shortvideo = noop,
+  location = noop,
+  link = noop,
+  subscribe = noop,
+  unsubscribe = noop,
+  qrcode = noop,
+  eventLocation = noop,
+  click = noop,
+  view = noop) {
+  if (!xml) {
+    return;
+  }
+  // 重试的消息排重
+  var repeat = xml.FromUserName.join('') + xml.CreateTime.join('');
+  var isFirstCall = true;
+  for (var x in check) {
+    if (check[x] === repeat) {
+      isFirstCall = false;
+      break;
+    }
+  }
+  if (isFirstCall) {
+    check.push(repeat);
+  } else {
+    return;
+  }
+
+  // ToUserName	开发者微信号
+  // FromUserName	发送方帐号（一个OpenID）
+  // CreateTime	消息创建时间 （整型）
+  // MsgType	text
+  // Content	文本消息内容
+  // MsgId	消息id，64位整型
+  if (xml.MsgType[0] === 'text') {
+    (typeof text === 'function') ? text(xml) : noop(xml);
+  //
+  // ToUserName	开发者微信号
+  // FromUserName	发送方帐号（一个OpenID）
+  // CreateTime	消息创建时间 （整型）
+  // MsgType	image
+  // PicUrl	图片链接
+  // MediaId	图片消息媒体id，可以调用多媒体文件下载接口拉取数据。
+  // MsgId	消息id，64位整型
+  } else if (xml.MsgType[0] === 'image') {
+    (typeof image === 'function') ? image(xml) : noop(xml);
+  //
+  // ToUserName	开发者微信号
+  // FromUserName	发送方帐号（一个OpenID）
+  // CreateTime	消息创建时间 （整型）
+  // MsgType	语音为voice
+  // MediaId	语音消息媒体id，可以调用多媒体文件下载接口拉取数据。
+  // Format	语音格式，如amr，speex等
+  // MsgID	消息id，64位整型
+  } else if (xml.MsgType[0] === 'voice') {
+    (typeof voice === 'function') ? voice(xml) : noop(xml);
+  //
+  // ToUserName	开发者微信号
+  // FromUserName	发送方帐号（一个OpenID）
+  // CreateTime	消息创建时间 （整型）
+  // MsgType	视频为video
+  // MediaId	视频消息媒体id，可以调用多媒体文件下载接口拉取数据。
+  // ThumbMediaId	视频消息缩略图的媒体id，可以调用多媒体文件下载接口拉取数据。
+  // MsgId	消息id，64位整型
+  } else if (xml.MsgType[0] === 'video') {
+    (typeof video === 'function') ? video(xml) : noop(xml);
+  //
+  // ToUserName	开发者微信号
+  // FromUserName	发送方帐号（一个OpenID）
+  // CreateTime	消息创建时间 （整型）
+  // MsgType	小视频为shortvideo
+  // MediaId	视频消息媒体id，可以调用多媒体文件下载接口拉取数据。
+  // ThumbMediaId	视频消息缩略图的媒体id，可以调用多媒体文件下载接口拉取数据。
+  // MsgId	消息id，64位整型
+  } else if (xml.MsgType[0] === 'shortvideo') {
+    (typeof shortvideo === 'function') ? shortvideo(xml) : noop(xml);
+  //
+  // ToUserName	开发者微信号
+  // FromUserName	发送方帐号（一个OpenID）
+  // CreateTime	消息创建时间 （整型）
+  // MsgType	location
+  // Location_X	地理位置维度
+  // Location_Y	地理位置经度
+  // Scale	地图缩放大小
+  // Label	地理位置信息
+  // MsgId	消息id，64位整型
+  } else if (xml.MsgType[0] === 'location') {
+    (typeof location === 'function') ? location(xml) : noop(xml);
+  //
+  // ToUserName	接收方微信号
+  // FromUserName	发送方微信号，若为普通用户，则是一个OpenID
+  // CreateTime	消息创建时间
+  // MsgType	消息类型，link
+  // Title	消息标题
+  // Description	消息描述
+  // Url	消息链接
+  // MsgId	消息id，64位整型
+  } else if (xml.MsgType[0] === 'link') {
+    (typeof link === 'function') ? link(xml) : noop(xml);
+  } else if (xml.MsgType[0] === 'event') {
+    //
+    // ToUserName	开发者微信号
+    // FromUserName	发送方帐号（一个OpenID）
+    // CreateTime	消息创建时间 （整型）
+    // MsgType	消息类型，event
+    // Event	事件类型，subscribe(订阅)、unsubscribe(取消订阅)
+    if (xml.Event[0] === 'subscribe') {
+      (typeof subscribe === 'function') ? subscribe(xml) : noop(xml);
+      //
+      // ToUserName	开发者微信号
+      // FromUserName	发送方帐号（一个OpenID）
+      // CreateTime	消息创建时间 （整型）
+      // MsgType	消息类型，event
+      // Event	事件类型，subscribe
+      // EventKey	事件KEY值，qrscene_为前缀，后面为二维码的参数值
+      // Ticket	二维码的ticket，可用来换取二维码图片
+      if (xml.EventKey) {
+        (typeof qrcode === 'function') ? qrcode(xml) : noop(xml);
+      }
+    //
+    // ToUserName	开发者微信号
+    // FromUserName	发送方帐号（一个OpenID）
+    // CreateTime	消息创建时间 （整型）
+    // MsgType	消息类型，event
+    // Event	事件类型，subscribe(订阅)、unsubscribe(取消订阅)
+    } else if (xml.Event[0] === 'unsubscribe') {
+      (typeof unsubscribe === 'function') ? unsubscribe(xml) : noop(xml);
+    //
+    // ToUserName	开发者微信号
+    // FromUserName	发送方帐号（一个OpenID）
+    // CreateTime	消息创建时间 （整型）
+    // MsgType	消息类型，event
+    // Event	事件类型，SCAN
+    // EventKey	事件KEY值，是一个32位无符号整数，即创建二维码时的二维码scene_id
+    // Ticket	二维码的ticket，可用来换取二维码图片
+    } else if (xml.Event[0] === 'SCAN') {
+      (typeof qrcode === 'function') ? qrcode(xml) : noop(xml);
+    //
+    // ToUserName	开发者微信号
+    // FromUserName	发送方帐号（一个OpenID）
+    // CreateTime	消息创建时间 （整型）
+    // MsgType	消息类型，event
+    // Event	事件类型，LOCATION
+    // Latitude	地理位置纬度
+    // Longitude	地理位置经度
+    // Precision	地理位置精度
+    } else if (xml.Event[0] === 'LOCATION') {
+      (typeof eventLocation === 'function') ? eventLocation(xml) : noop(xml);
+    //
+    // ToUserName	开发者微信号
+    // FromUserName	发送方帐号（一个OpenID）
+    // CreateTime	消息创建时间 （整型）
+    // MsgType	消息类型，event
+    // Event	事件类型，CLICK
+    // EventKey	事件KEY值，与自定义菜单接口中KEY值对应
+    } else if (xml.Event[0] === 'CLICK') {
+      (typeof click === 'function') ? click(xml) : noop(xml);
+    //
+    // ToUserName	开发者微信号
+    // FromUserName	发送方帐号（一个OpenID）
+    // CreateTime	消息创建时间 （整型）
+    // MsgType	消息类型，event
+    // Event	事件类型，VIEW
+    // EventKey	事件KEY值，设置的跳转URL
+    } else if (xml.Event[0] === 'VIEW') {
+      (typeof view === 'function') ? view(xml) : noop(xml);
+    }
+  }
+  return;
 };

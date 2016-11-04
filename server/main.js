@@ -46,28 +46,20 @@ Meteor.startup(() => {
     })
     .post(function() {
       var result = xml2js.parseStringSync(this.request.rawBody);
-      var repeat = result.xml.FromUserName.join('') + result.xml.CreateTime.join('');
-      var dothing = true;
-      for (var x in check) {
-        if (check[x] === repeat) {
-          dothing = false;
-          break;
-        }
-      }
-      if (result.xml && dothing) {
-        check.push(repeat);
-        if (result.xml.Event[0] === 'subscribe') {
-          userService.addUser(result.xml.FromUserName[0]);
-        }
-        if (result.xml.EventKey && result.xml.EventKey.join('') && (result.xml.Event[0] === 'subscribe' || result.xml.Event[0] === 'SCAN')) {
-          var qrcodeid = result.xml.EventKey.join('');
+      wxService.receiveMessage(
+        result.xml,
+        subscribe = function(xml) {
+          userService.addUser(xml.FromUserName[0]);
+        },
+        qrcode = function(xml) {
+          var qrcodeid = xml.EventKey.join('');
           qrcodeid = qrcodeid.replace(/qrscene_/, '');
           qrcodeid = parseInt(qrcodeid, 10);
           var templateData;
           if (qrcodeid < 1000000) {
             var followid = qrcodeid;
             var teacher = userService.getUserInfoByUid(followid);
-            var student = userService.getUser(result.xml.FromUserName[0]);
+            var student = userService.getUser(xml.FromUserName[0]);
 
             templateData = {
               text: {
@@ -96,7 +88,7 @@ Meteor.startup(() => {
                 color: '#173177'
               }
             };
-            student = userService.getUser(result.xml.FromUserName[0]);
+            student = userService.getUser(xml.FromUserName[0]);
             wxService.sendTemplate(
               student.openid,
               config.follow_template_id,
@@ -108,7 +100,8 @@ Meteor.startup(() => {
             }
           }
         }
-      }
+      );
+
       this.response.end('');
     });
 
