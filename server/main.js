@@ -6,7 +6,6 @@ var chapterService = require('./service/chapter.js');
 var newsService = require('./service/news.js');
 var userService = require('./service/user.js');
 var marked = require('marked');
-var check = [];
 
 Meteor.startup(() => {
   if (Meteor.isServer) {
@@ -46,61 +45,63 @@ Meteor.startup(() => {
     })
     .post(function() {
       var result = xml2js.parseStringSync(this.request.rawBody);
-      wxService.receiveMessage({
-        xml: result.xml,
-        subscribe: function(xml) {
-          userService.addUser(xml.FromUserName[0]);
-        },
-        qrcode: function(xml) {
-          var qrcodeid = xml.EventKey.join('');
-          qrcodeid = qrcodeid.replace(/qrscene_/, '');
-          qrcodeid = parseInt(qrcodeid, 10);
-          var templateData;
-          if (qrcodeid < 1000000) {
-            var followid = qrcodeid;
-            var teacher = userService.getUserInfoByUid(followid);
-            var student = userService.getUser(xml.FromUserName[0]);
+      wxService.receiveMessage(
+        result.xml,
+        {
+          subscribe: function(xml) {
+            userService.addUser(xml.FromUserName[0]);
+          },
+          qrcode: function(xml) {
+            var qrcodeid = xml.EventKey.join('');
+            qrcodeid = qrcodeid.replace(/qrscene_/, '');
+            qrcodeid = parseInt(qrcodeid, 10);
+            var templateData;
+            if (qrcodeid < 1000000) {
+              var followid = qrcodeid;
+              var teacher = userService.getUserInfoByUid(followid);
+              var student = userService.getUser(xml.FromUserName[0]);
 
-            templateData = {
-              text: {
-                value: '你已关注 ' + teacher.nickname,
-                color: '#173177'
-              }
-            };
-            wxService.sendTemplate(student.openid, config.follow_template_id, null, templateData);
-
-            if (!userService.isFollowed(teacher.openid, student.openid)) {
               templateData = {
                 text: {
-                  value: '你已被 ' + student.nickname + ' 关注',
+                  value: '你已关注 ' + teacher.nickname,
                   color: '#173177'
                 }
               };
-              wxService.sendTemplate(teacher.openid, config.follow_template_id, null, templateData);
-              userService.addFollower(teacher.openid, student.openid);
-            }
-          } else {
-            var course = courseService.courseInfoByQrcode(qrcodeid);
+              wxService.sendTemplate(student.openid, config.follow_template_id, null, templateData);
 
-            templateData = {
-              text: {
-                value: '你已加入《' + course.name + '》',
-                color: '#173177'
+              if (!userService.isFollowed(teacher.openid, student.openid)) {
+                templateData = {
+                  text: {
+                    value: '你已被 ' + student.nickname + ' 关注',
+                    color: '#173177'
+                  }
+                };
+                wxService.sendTemplate(teacher.openid, config.follow_template_id, null, templateData);
+                userService.addFollower(teacher.openid, student.openid);
               }
-            };
-            student = userService.getUser(xml.FromUserName[0]);
-            wxService.sendTemplate(
-              student.openid,
-              config.follow_template_id,
-              config.url + '/course_info_student/' + course._id,
-              templateData);
+            } else {
+              var course = courseService.courseInfoByQrcode(qrcodeid);
 
-            if (!courseService.isChooseCourse(course._id, student.openid)) {
-              courseService.chooseCourse(course._id, student.openid);
+              templateData = {
+                text: {
+                  value: '你已加入《' + course.name + '》',
+                  color: '#173177'
+                }
+              };
+              student = userService.getUser(xml.FromUserName[0]);
+              wxService.sendTemplate(
+                student.openid,
+                config.follow_template_id,
+                config.url + '/course_info_student/' + course._id,
+                templateData);
+
+              if (!courseService.isChooseCourse(course._id, student.openid)) {
+                courseService.chooseCourse(course._id, student.openid);
+              }
             }
           }
         }
-      });
+      );
 
       this.response.end('');
     });
