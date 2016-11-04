@@ -48,9 +48,11 @@ Meteor.startup(() => {
       wxService.receiveMessage(
         result.xml,
         {
+          // 关注事件
           subscribe: function(xml) {
             userService.addUser(xml.FromUserName[0]);
           },
+          // 二维码扫码事件
           qrcode: function(xml) {
             var qrcodeid = xml.EventKey.join('');
             qrcodeid = qrcodeid.replace(/qrscene_/, '');
