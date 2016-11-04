@@ -46,12 +46,12 @@ Meteor.startup(() => {
     })
     .post(function() {
       var result = xml2js.parseStringSync(this.request.rawBody);
-      wxService.receiveMessage(
-        result.xml,
-        subscribe = function(xml) {
+      wxService.receiveMessage({
+        xml: result.xml,
+        subscribe: function(xml) {
           userService.addUser(xml.FromUserName[0]);
         },
-        qrcode = function(xml) {
+        qrcode: function(xml) {
           var qrcodeid = xml.EventKey.join('');
           qrcodeid = qrcodeid.replace(/qrscene_/, '');
           qrcodeid = parseInt(qrcodeid, 10);
@@ -100,7 +100,7 @@ Meteor.startup(() => {
             }
           }
         }
-      );
+      });
 
       this.response.end('');
     });
