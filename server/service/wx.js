@@ -225,9 +225,9 @@ exports.checkToken = function(nonce, timestamp, signature, echostr) {
  */
 var noop = function(xml) {
   if (xml.MsgType[0] === 'event') {
-    console.log("[[[ " + xml.Event[0] + " is not implement]]]");
+    console.log("[[[ event " + xml.Event[0] + " is not implement]]]");
   } else {
-    console.log("[[[ " + xml.MsgType[0] + " is not implement]]]");
+    console.log("[[[ message " + xml.MsgType[0] + " is not implement]]]");
   }
 };
 
@@ -354,7 +354,6 @@ exports.receiveMessage = function(xml, callback) {
 
   // [[[接收事件推送]]]
   } else if (xml.MsgType[0] === 'event') {
-
     // ToUserName	开发者微信号
     // FromUserName	发送方帐号（一个OpenID）
     // CreateTime	消息创建时间 （整型）
