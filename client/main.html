@@ -1,13 +1,11 @@
 <head>
   <title>kingke</title>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+  <link rel="stylesheet" href="/css/weui.min.css" />
 </head>
-<body>
-  
-  <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
-  <script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+
+<body style="background-color: #f8f8f8;">
 </body>
 
 <template name="Home">
@@ -15,30 +13,27 @@
   <a class="btn btn-default" href="/setmenu">设置菜单按钮</a>
 </template>
 
-<template name="Notify">
-  <div class="container-fluid" style="padding-top: 50px;">
-    <div class="row">
-      <div class="col-md-6 col-md-offset-3 col-xs-12">
-        <form action="/notifyAns" method="post" role="form">
-          <div class="form-group">
-            <label for="infoBegin">通知详情</label>
-            <input type="text" name="infoBegin" id="infoBegin" class="form-control">
-          </div>
-          <div class="form-group">
-            <label for="course">课程名</label>
-            <input type="text" name="course" id="course" placeholder="课程名" class="form-control">
-          </div>
-          <div class="form-group">
-            <label for="teacher">教师</label>
-            <input type="text" name="teacher" id="teacher" placeholder="教师" class="form-control">
-          </div>
-          <div class="form-group">
-            <label for="infoEnd">结尾</label>
-            <input type="text" name="infoEnd" id="infoEnd" placeholder="结尾" class="form-control">
-          </div>
-          <button type="submit" class="btn btn-default">通知</button>
-        </form>
-      </div>
-    </div>
+<template name="Chat">
+  <div class="weui-cells__title">聊天室</div>
+	<div class="weui-cells weui-cells_form">
+		<div class="weui-cell weui-cell_vcode">
+			<div class="weui-cell__hd">
+				<label class="weui-label" style="margin-right:10px;width:auto;">消息:</label>
+			</div>
+			<div class="weui-cell__bd">
+				<input class="weui-input" id="message" type="text">
+			</div>
+			<div class="weui-cell__ft">
+				<a href="javascript:sendMessage();" class="weui-vcode-btn">发送</a>
+			</div>
+		</div>
+	</div>
+  
+  <div class="page__bd">
+    <article class="weui-article">
+    {{#each messages}}
+      <p><strong>{{name}}:</strong> {{message}}</p>
+    {{/each}}
+    </article>
   </div>
 </template>
